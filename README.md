@@ -1,79 +1,51 @@
-RoadRunners: High-Performance Social Running App
+RoadRunners: Your Path to Better Running
 
-RoadRunners is a single-page, full-stack application designed to track and enhance the running experience through community, personalized training, and competitive features. It focuses exclusively on the needs of runners, providing tools for both individual progress and group motivation.
+Welcome to RoadRunners! This app is designed for runners of all levels who want to push their limits, stay injury-free, and build a strong community. We provide the tools you need to track your miles and motivate your team.
 
-🚀 Core Features
+🏃 Getting Started & Key Features
 
-RoadRunners goes beyond simple mileage logging by incorporating deep social integration and personalized coaching elements.
+RoadRunners is built around three pillars: Community, Personalized Training, and Practical Tools.
 
-1. Social & Community
+1. The Social Hub: Community & Motivation
 
-Activity Feed: A real-time feed showcasing runs logged by group members and the wider community.
+Running is better together! Our social features keep you connected and accountable.
 
-Groups & Leaderboards: Create or join running groups, view simplified weekly distance leaderboards, and engage in real-time chat with teammates.
+Activity Feed: See your latest runs and those of your running groups in one simple, real-time feed.
 
-Kudos System: Encourage fellow runners by giving "Kudos" (high-fives) on their logged runs.
+Groups & Competition: Create a group for your friends, club, or team. Easily view weekly distance Leaderboards to spark some friendly competition. You can also send real-time messages and chat right within your group.
 
-2. Personalized Training
+Give Kudos: Show support for your fellow runners! Hit the "Kudos" button (our version of a high-five) on any run in the feed to celebrate their effort.
 
-Structured Workout Planner: Based on a user's self-selected training goal (e.g., Short Distance, Long Distance, General Fitness), the app generates a balanced weekly schedule incorporating Endurance, Speed, Strength, and Recovery sessions.
+2. Personalized Training & Growth
 
-Personal Profile: Track your overall running metrics, personal bests, and manage your training goals.
+Stop guessing and start training smarter. We give you a plan that's tailored to your goals.
 
-3. Practical Utilities
+Structured Workout Planner: Based on your current fitness level and your primary goal (e.g., training for a 5K, a marathon, or just staying fit), the app generates a balanced weekly schedule. This plan includes:
 
-Shoe Mileage Tracker: Track the total kilometers run in each pair of running shoes. Receive alerts or visual indicators when a pair is nearing its recommended retirement mileage (default 800km) to help prevent injury.
+Endurance Runs: Building your base stamina.
 
-Manual Run Logging: Easily log your runs with distance, duration, and date.
+Speed Workouts: Getting faster and improving your running form.
 
-4. External Integration (Planned)
+Strength Sessions: Crucial lifting and bodyweight exercises to prevent common running injuries.
 
-The application is designed to support integration with major external tracking services (e.g., Garmin, Apple Health, Strava, Nike Run Club, Adidas Running) to automatically sync run data.
+Your Personal Profile: This is your running résumé. Track your lifetime mileage, see your all-time personal bests (PBs), and easily update your training goals and personal information.
 
-🎨 Design & Branding
+3. Practical Tools for Runners
 
-The application follows a high-contrast, performance-focused aesthetic:
+We focus on the small details that make a big difference in training.
 
-Palette: High-contrast Dark Mode with a core palette of near-black backgrounds (#0D0D0D), dark surfaces (#1A1A1A), white text (#FFFFFF), and a vibrant RoadRunner Blue (#1E90FF) accent color for all calls-to-action and key data points.
+Manual Run Logging: Quickly and easily log any run with distance, duration, and date.
 
-Aesthetics: Modern, minimalist design utilizing clean typography (Inter), rounded corners, and Lucide icons for clarity.
+Shoe Mileage Tracker: Know exactly when it’s time to retire your running shoes. Log each pair, and RoadRunners tracks the mileage they accumulate. We'll give you a visual warning when you approach the standard replacement limit (defaulting to 800km) to help you stay ahead of injury!
 
-⚙️ Technology Stack
+4. Future Integrations
 
-This application is built as a single-page React component for simplicity and fast development, utilizing powerful modern tools for a full-stack experience.
+We are built to connect! In the future, you'll be able to link your account with popular external devices and apps like Garmin, Apple Health, Strava, Nike Run Club, and Adidas Running to automatically sync your runs.
 
-Frontend: React (Functional Components and Hooks)
+🎨 The RoadRunners Look
 
-Styling: Tailwind CSS
+Our design is clean, fast, and focused on performance data:
 
-Backend/Database: Firebase Firestore (Real-time data synchronization)
+High Contrast: We use a deep dark background with bright white text to make all your data instantly readable, especially when you're checking your stats on the go.
 
-Authentication: Firebase Custom Token/Anonymous Sign-in for user management and secure data access.
-
-🛠️ Data Structure Overview
-
-Data persistence is managed via Firestore, with strict separation between user-private and public/community data:
-
-Data Type
-
-Firestore Path Type
-
-Example Fields
-
-User Profiles
-
-Private (.../users/{userId}/profiles/{userId})
-
-username, trainingGoal, shoeTracker[]
-
-Runs
-
-Public (.../public/data/runs/{runId})
-
-userId, distanceKm, paceMinPerKm, kudosCount
-
-Groups
-
-Public (.../public/data/groups/{groupId})
-
-groupName, members[], messages[] (subcollection)
+RoadRunner Blue: Our signature blue color is used to highlight the most important things—like your progress, active buttons, and new achievements—so they always stand out.
