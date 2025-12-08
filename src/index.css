@@ -1,13 +1,41 @@
 @import "tailwindcss";
 
+/* Orbitron (for numbers) and Alumni Sans Pinstripe (for text) */
+@import url('https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Orbitron:wght@400..900&display=swap');
+
 @theme {
   --color-background: #0D0D0D;
   --color-surface: #1A1A1A;
   --color-primary: #1E90FF;
   --color-secondary: #999999;
+
+  --font-sans: "Alumni Sans Pinstripe", sans-serif;
+  --font-display: "Orbitron", sans-serif;
+
+  /* Alumni Sans Pinstripe is extremely condensed and small/thin. 
+     We need to aggressively bump up the standard sizes to make it legible. */
+  --text-xs: 1.1rem;
+  /* Was 0.75rem */
+  --text-sm: 1.25rem;
+  /* Was 0.875rem */
+  --text-base: 1.5rem;
+  /* Was 1rem */
+  --text-lg: 1.75rem;
+  /* Was 1.125rem */
+  --text-xl: 2rem;
+  /* Was 1.25rem */
+  --text-2xl: 2.25rem;
+  /* Was 1.5rem */
+  --text-3xl: 2.5rem;
+  /* Was 1.875rem */
 }
 
 body {
   background-color: var(--color-background);
   color: #FFFFFF;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 400;
+  /* Ensure it's not too thin by default */
+  /* Alumni Sans Pinstripe is condensed/thin, bumping size slightly helps readability */
 }

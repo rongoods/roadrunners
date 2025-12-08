@@ -131,7 +131,7 @@ function TabNavigation({ activeTab, onTabChange }) {
               )}
             >
               <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[10px] mt-1 font-medium">{tab.label}</span>
+              <span className="text-[10px] mt-1 font-medium font-sans">{tab.label}</span>
             </button>
           );
         })}
@@ -299,15 +299,15 @@ function FeedView({ user, profile }) {
 
               <div className="grid grid-cols-3 gap-4 py-2">
                 <div className="text-center">
-                  <p className="text-xl font-bold text-primary">{run.distanceKm}</p>
+                  <p className="text-xl font-bold text-primary font-display">{run.distanceKm}</p>
                   <p className="text-[10px] text-secondary uppercase tracking-wider">km</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xl font-bold text-white">{run.paceMinPerKm}</p>
+                  <p className="text-xl font-bold text-white font-display">{run.paceMinPerKm}</p>
                   <p className="text-[10px] text-secondary uppercase tracking-wider">min/km</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xl font-bold text-white">{run.durationMinutes}</p>
+                  <p className="text-xl font-bold text-white font-display">{run.durationMinutes}</p>
                   <p className="text-[10px] text-secondary uppercase tracking-wider">min</p>
                 </div>
               </div>
@@ -319,7 +319,7 @@ function FeedView({ user, profile }) {
                 >
                   <Trophy size={16} />
                   <span>Kudos</span>
-                  <span className="font-mono bg-white/10 px-1.5 rounded text-white text-xs">{run.kudosCount || 0}</span>
+                  <span className="font-mono bg-white/10 px-1.5 rounded text-white text-xs font-display">{run.kudosCount || 0}</span>
                 </button>
               </div>
             </div>
@@ -447,7 +447,7 @@ function GroupsView({ user, profile }) {
               activeGroup.leaderboard.map((entry, i) => (
                 <div key={i} className="flex justify-between text-sm">
                   <span className="text-white">{i + 1}. {entry.username}</span>
-                  <span className="text-primary font-bold">{entry.distance}km</span>
+                  <span className="text-primary font-bold font-display">{entry.distance}km</span>
                 </div>
               ))
             ) : (
@@ -795,12 +795,12 @@ function ProfileView({ user, profile }) {
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-surface p-4 rounded-xl border border-white/5 text-center">
           <TrendingUp size={24} className="text-primary mx-auto mb-2" />
-          <p className="text-2xl font-bold text-white">{stats.totalKm}</p>
+          <p className="text-2xl font-bold text-white font-display">{stats.totalKm}</p>
           <p className="text-xs text-secondary uppercase">Total km</p>
         </div>
         <div className="bg-surface p-4 rounded-xl border border-white/5 text-center">
           <Trophy size={24} className="text-primary mx-auto mb-2" />
-          <p className="text-2xl font-bold text-white">{stats.longest}</p>
+          <p className="text-2xl font-bold text-white font-display">{stats.longest}</p>
           <p className="text-xs text-secondary uppercase">Longest Run</p>
         </div>
       </div>
@@ -834,7 +834,7 @@ function ProfileView({ user, profile }) {
               <div key={shoe.id} className="bg-surface p-4 rounded-xl border border-white/5">
                 <div className="flex justify-between mb-2">
                   <span className="font-medium text-white">{shoe.name}</span>
-                  <span className="text-sm text-secondary">{shoe.currentMileage} / {shoe.targetMileage} km</span>
+                  <span className="text-sm text-secondary font-display">{shoe.currentMileage} / {shoe.targetMileage} km</span>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                   <div
