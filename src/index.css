@@ -7,7 +7,7 @@
   /* Default Theme (Dark Mode) */
   --bg-color: #0D0D0D;
   --surface-color: #1A1A1A;
-  --primary-color: #1E90FF;
+  --primary-color: #0028ff;
   --text-color: #FFFFFF;
   --secondary-color: #999999;
 }
@@ -19,7 +19,7 @@ html.light-mode {
   /* Clean light gray/white */
   --surface-color: #FFFFFF;
   /* White cards */
-  --primary-color: #1E90FF;
+  --primary-color: #0028ff;
   /* Keep RoadRunner Blue */
   --text-color: #000000;
   /* Pure Black text */
