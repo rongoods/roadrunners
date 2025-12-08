@@ -24,7 +24,9 @@ import {
   MapPin,
   Clock,
   TrendingUp,
-  AlertTriangle
+  AlertTriangle,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { clsx } from 'clsx';
@@ -116,7 +118,7 @@ function TabNavigation({ activeTab, onTabChange }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-white/10 safe-area-bottom z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-text/10 safe-area-bottom z-50">
       <div className="flex justify-around items-center h-16">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -127,7 +129,7 @@ function TabNavigation({ activeTab, onTabChange }) {
               onClick={() => onTabChange(tab.id)}
               className={cn(
                 "flex flex-col items-center justify-center w-full h-full transition-colors",
-                isActive ? "text-primary" : "text-secondary hover:text-white"
+                isActive ? "text-primary" : "text-secondary hover:text-text"
               )}
             >
               <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
@@ -210,7 +212,7 @@ function FeedView({ user, profile }) {
   return (
     <div className="p-4 space-y-4 pb-24">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Activity Feed</h1>
+        <h1 className="text-2xl font-bold text-text">Activity Feed</h1>
         <button
           onClick={() => setShowLogForm(!showLogForm)}
           className="bg-primary text-white p-2 rounded-full shadow-lg hover:bg-white/20 transition-colors"
@@ -220,7 +222,7 @@ function FeedView({ user, profile }) {
       </div>
 
       {showLogForm && (
-        <form onSubmit={handleLogRun} className="bg-surface p-4 rounded-xl border border-white/10 space-y-4">
+        <form onSubmit={handleLogRun} className="bg-surface p-4 rounded-xl border border-text/10 space-y-4">
           <h3 className="font-semibold text-lg">Log a Run</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -229,7 +231,7 @@ function FeedView({ user, profile }) {
                 type="number" step="0.01" required
                 value={newRun.distance}
                 onChange={e => setNewRun({ ...newRun, distance: e.target.value })}
-                className="w-full bg-background border border-white/10 rounded-md p-2 text-white focus:border-primary outline-none"
+                className="w-full bg-background border border-text/10 rounded-md p-2 text-text focus:border-primary outline-none"
               />
             </div>
             <div>
@@ -238,7 +240,7 @@ function FeedView({ user, profile }) {
                 type="number" step="1" required
                 value={newRun.duration}
                 onChange={e => setNewRun({ ...newRun, duration: e.target.value })}
-                className="w-full bg-background border border-white/10 rounded-md p-2 text-white focus:border-primary outline-none"
+                className="w-full bg-background border border-text/10 rounded-md p-2 text-text focus:border-primary outline-none"
               />
             </div>
           </div>
@@ -248,7 +250,7 @@ function FeedView({ user, profile }) {
               type="date" required
               value={newRun.date}
               onChange={e => setNewRun({ ...newRun, date: e.target.value })}
-              className="w-full bg-background border border-white/10 rounded-md p-2 text-white focus:border-primary outline-none"
+              className="w-full bg-background border border-text/10 rounded-md p-2 text-text focus:border-primary outline-none"
             />
           </div>
           {profile?.shoeTracker?.length > 0 && (
@@ -257,7 +259,7 @@ function FeedView({ user, profile }) {
               <select
                 value={newRun.shoeId}
                 onChange={e => setNewRun({ ...newRun, shoeId: e.target.value })}
-                className="w-full bg-background border border-white/10 rounded-md p-2 text-white focus:border-primary outline-none"
+                className="w-full bg-background border border-text/10 rounded-md p-2 text-text focus:border-primary outline-none"
               >
                 <option value="">Select Shoes</option>
                 {profile.shoeTracker.map(s => (
@@ -282,11 +284,11 @@ function FeedView({ user, profile }) {
             <div key={run.id} className="bg-surface p-4 rounded-xl border border-white/5 space-y-3">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-text/10 flex items-center justify-center">
                     <User size={16} className="text-secondary" />
                   </div>
                   <div>
-                    <p className="font-medium text-white">{run.username}</p>
+                    <p className="font-medium text-text">{run.username}</p>
                     <p className="text-xs text-secondary">{format(new Date(run.date), 'MMM d, yyyy')}</p>
                   </div>
                 </div>
@@ -303,23 +305,23 @@ function FeedView({ user, profile }) {
                   <p className="text-[10px] text-secondary uppercase tracking-wider">km</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xl font-bold text-white font-display">{run.paceMinPerKm}</p>
+                  <p className="text-xl font-bold text-text font-display">{run.paceMinPerKm}</p>
                   <p className="text-[10px] text-secondary uppercase tracking-wider">min/km</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xl font-bold text-white font-display">{run.durationMinutes}</p>
+                  <p className="text-xl font-bold text-text font-display">{run.durationMinutes}</p>
                   <p className="text-[10px] text-secondary uppercase tracking-wider">min</p>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-white/10 flex justify-end">
+              <div className="pt-2 border-t border-text/10 flex justify-end">
                 <button
                   onClick={() => giveKudos(run)}
                   className="flex items-center gap-1.5 text-secondary hover:text-primary transition-colors text-sm"
                 >
                   <Trophy size={16} />
                   <span>Kudos</span>
-                  <span className="font-mono bg-white/10 px-1.5 rounded text-white text-xs font-display">{run.kudosCount || 0}</span>
+                  <span className="font-mono bg-text/10 px-1.5 rounded text-text text-xs font-display">{run.kudosCount || 0}</span>
                 </button>
               </div>
             </div>
@@ -429,11 +431,11 @@ function GroupsView({ user, profile }) {
   if (activeGroup) {
     return (
       <div className="flex flex-col h-[calc(100vh-80px)]">
-        <div className="p-4 border-b border-white/10 flex items-center gap-2 bg-surface/50 backdrop-blur-md sticky top-0 z-10">
-          <button onClick={() => setActiveGroup(null)} className="text-secondary hover:text-white">
+        <div className="p-4 border-b border-text/10 flex items-center gap-2 bg-surface/50 backdrop-blur-md sticky top-0 z-10">
+          <button onClick={() => setActiveGroup(null)} className="text-secondary hover:text-text">
             ← Back
           </button>
-          <h2 className="text-lg font-bold text-white flex-1">{activeGroup.groupName}</h2>
+          <h2 className="text-lg font-bold text-text flex-1">{activeGroup.groupName}</h2>
           <Users size={16} className="text-primary" />
         </div>
 
@@ -446,7 +448,7 @@ function GroupsView({ user, profile }) {
             {activeGroup.leaderboard && activeGroup.leaderboard.length > 0 ? (
               activeGroup.leaderboard.map((entry, i) => (
                 <div key={i} className="flex justify-between text-sm">
-                  <span className="text-white">{i + 1}. {entry.username}</span>
+                  <span className="text-text">{i + 1}. {entry.username}</span>
                   <span className="text-primary font-bold font-display">{entry.distance}km</span>
                 </div>
               ))
@@ -461,7 +463,7 @@ function GroupsView({ user, profile }) {
               <div key={msg.id} className={cn("flex flex-col", msg.userId === user?.uid ? "items-end" : "items-start")}>
                 <div className={cn(
                   "max-w-[80%] rounded-xl px-3 py-2 text-sm",
-                  msg.userId === user?.uid ? "bg-primary text-white" : "bg-white/10 text-white"
+                  msg.userId === user?.uid ? "bg-primary text-white" : "bg-text/10 text-text"
                 )}>
                   {msg.userId !== user?.uid && <p className="text-[10px] opacity-50 mb-0.5">{msg.username}</p>}
                   <p>{msg.text}</p>
@@ -477,7 +479,7 @@ function GroupsView({ user, profile }) {
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
             placeholder="Message..."
-            className="flex-1 bg-surface border border-white/10 rounded-full px-4 py-2 text-sm focus:border-primary outline-none text-white"
+            className="flex-1 bg-surface border border-white/10 rounded-full px-4 py-2 text-sm focus:border-primary outline-none text-text"
           />
           <button type="submit" className="bg-primary p-2 rounded-full text-white hover:opacity-90">
             <Send size={18} />
@@ -490,7 +492,7 @@ function GroupsView({ user, profile }) {
   return (
     <div className="p-4 space-y-4 pb-24">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Groups</h1>
+        <h1 className="text-2xl font-bold text-text">Groups</h1>
         <button
           onClick={() => setShowCreateGroup(!showCreateGroup)}
           className="text-primary text-sm font-medium hover:underline"
@@ -504,7 +506,7 @@ function GroupsView({ user, profile }) {
           <input
             value={newGroupName}
             onChange={e => setNewGroupName(e.target.value)}
-            className="flex-1 bg-background border border-white/10 rounded-md p-2 text-white focus:border-primary outline-none"
+            className="flex-1 bg-background border border-white/10 rounded-md p-2 text-text focus:border-primary outline-none"
             placeholder="Group Name"
             required
           />
@@ -526,7 +528,7 @@ function GroupsView({ user, profile }) {
               className="bg-surface p-4 rounded-xl border border-white/5 hover:border-primary/50 transition-colors cursor-pointer flex justify-between items-center"
             >
               <div>
-                <h3 className="font-bold text-white">{group.groupName}</h3>
+                <h3 className="font-bold text-text">{group.groupName}</h3>
                 <p className="text-xs text-secondary">{group.members?.length || 0} Members</p>
               </div>
               <Users size={20} className="text-secondary" />
@@ -640,22 +642,22 @@ function PlanView({ user, profile }) {
   if (!localProfile?.trainingGoal || isEditing) {
     return (
       <div className="p-4 space-y-4 pb-24">
-        <h1 className="text-2xl font-bold text-white">Setup Plan</h1>
+        <h1 className="text-2xl font-bold text-text">Setup Plan</h1>
         <form onSubmit={handleUpdateProfile} className="bg-surface p-4 rounded-xl border border-white/10 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Customize your Training</h2>
+          <h2 className="text-lg font-semibold text-text">Customize your Training</h2>
           <p className="text-sm text-secondary">Tell us about yourself to generate a weekly schedule.</p>
 
           <div>
             <label className="text-xs text-secondary">Age</label>
-            <input value={formData.age} onChange={e => setFormData({ ...formData, age: e.target.value })} type="number" required className="w-full bg-background border border-white/10 rounded-md p-2 text-white" />
+            <input value={formData.age} onChange={e => setFormData({ ...formData, age: e.target.value })} type="number" required className="w-full bg-background border border-white/10 rounded-md p-2 text-text" />
           </div>
           <div>
             <label className="text-xs text-secondary">Weight (kg)</label>
-            <input value={formData.weightKg} onChange={e => setFormData({ ...formData, weightKg: e.target.value })} type="number" required className="w-full bg-background border border-white/10 rounded-md p-2 text-white" />
+            <input value={formData.weightKg} onChange={e => setFormData({ ...formData, weightKg: e.target.value })} type="number" required className="w-full bg-background border border-white/10 rounded-md p-2 text-text" />
           </div>
           <div>
             <label className="text-xs text-secondary">Goal</label>
-            <select value={formData.trainingGoal} onChange={e => setFormData({ ...formData, trainingGoal: e.target.value })} className="w-full bg-background border border-white/10 rounded-md p-2 text-white">
+            <select value={formData.trainingGoal} onChange={e => setFormData({ ...formData, trainingGoal: e.target.value })} className="w-full bg-background border border-white/10 rounded-md p-2 text-text">
               <option value="General Fitness">General Fitness</option>
               <option value="Short Distance">Short Distance (5k/10k)</option>
               <option value="Long Distance">Long Distance (Half/Full)</option>
@@ -667,7 +669,7 @@ function PlanView({ user, profile }) {
             {isEditing && localProfile?.trainingGoal ? 'Update Plan' : 'Generate Plan'}
           </button>
           {isEditing && localProfile?.trainingGoal && (
-            <button type="button" onClick={() => setIsEditing(false)} className="w-full text-secondary text-sm pt-2 hover:text-white">Cancel</button>
+            <button type="button" onClick={() => setIsEditing(false)} className="w-full text-secondary text-sm pt-2 hover:text-text">Cancel</button>
           )}
         </form>
       </div>
@@ -679,13 +681,13 @@ function PlanView({ user, profile }) {
   return (
     <div className="p-4 space-y-4 pb-24">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Weekly Plan</h1>
+        <h1 className="text-2xl font-bold text-text">Weekly Plan</h1>
         <button onClick={() => setIsEditing(true)} className="text-primary text-sm font-medium">Edit Goal</button>
       </div>
 
       <div className="bg-surface p-4 rounded-xl border border-white/5 space-y-4">
         <div className="flex justify-between items-center border-b border-white/10 pb-2">
-          <h2 className="font-bold text-lg text-white">{localProfile.trainingGoal}</h2>
+          <h2 className="font-bold text-lg text-text">{localProfile.trainingGoal}</h2>
           <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">Week 1</span>
         </div>
         <div className="space-y-3">
@@ -694,10 +696,10 @@ function PlanView({ user, profile }) {
             return (
               <div key={i} className="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg transition-colors">
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                  <div className="text-xs font-bold text-white">{day.day}</div>
+                  <div className="text-xs font-bold text-text">{day.day}</div>
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-white text-sm">{day.type}</h4>
+                  <h4 className="font-medium text-text text-sm">{day.type}</h4>
                   <p className="text-xs text-secondary">{day.desc}</p>
                 </div>
                 <Icon size={16} className="text-secondary" />
@@ -784,10 +786,10 @@ function ProfileView({ user, profile }) {
     <div className="p-4 space-y-6 pb-24">
       <div className="flex items-center gap-4 border-b border-white/10 pb-6">
         <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center border-2 border-primary">
-          <User size={32} className="text-white" />
+          <User size={32} className="text-text" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-white">{localProfile?.username || user?.email?.split('@')[0] || 'Runner'}</h1>
+          <h1 className="text-xl font-bold text-text">{localProfile?.username || user?.email?.split('@')[0] || 'Runner'}</h1>
           <p className="text-secondary text-sm">{localProfile?.trainingGoal || 'No Goal Set'}</p>
         </div>
       </div>
@@ -795,19 +797,19 @@ function ProfileView({ user, profile }) {
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-surface p-4 rounded-xl border border-white/5 text-center">
           <TrendingUp size={24} className="text-primary mx-auto mb-2" />
-          <p className="text-2xl font-bold text-white font-display">{stats.totalKm}</p>
+          <p className="text-2xl font-bold text-text font-display">{stats.totalKm}</p>
           <p className="text-xs text-secondary uppercase">Total km</p>
         </div>
         <div className="bg-surface p-4 rounded-xl border border-white/5 text-center">
           <Trophy size={24} className="text-primary mx-auto mb-2" />
-          <p className="text-2xl font-bold text-white font-display">{stats.longest}</p>
+          <p className="text-2xl font-bold text-text font-display">{stats.longest}</p>
           <p className="text-xs text-secondary uppercase">Longest Run</p>
         </div>
       </div>
 
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold text-white">Shoe Tracker</h2>
+          <h2 className="text-lg font-bold text-text">Shoe Tracker</h2>
           <button onClick={() => setShowAddShoe(!showAddShoe)} className="text-primary text-sm font-medium">
             {showAddShoe ? 'Cancel' : '+ Add Shoe'}
           </button>
@@ -815,10 +817,10 @@ function ProfileView({ user, profile }) {
 
         {showAddShoe && (
           <form onSubmit={handleAddShoe} className="bg-surface p-4 rounded-xl border border-white/10 space-y-3">
-            <input value={newShoe.name} onChange={e => setNewShoe({ ...newShoe, name: e.target.value })} placeholder="Shoe Name" required className="w-full bg-background border border-white/10 rounded-md p-2 text-white" />
+            <input value={newShoe.name} onChange={e => setNewShoe({ ...newShoe, name: e.target.value })} placeholder="Shoe Name" required className="w-full bg-background border border-white/10 rounded-md p-2 text-text" />
             <div className="flex gap-2">
-              <input type="number" value={newShoe.startDist} onChange={e => setNewShoe({ ...newShoe, startDist: e.target.value })} placeholder="Start km" className="flex-1 bg-background border border-white/10 rounded-md p-2 text-white" />
-              <input type="number" value={newShoe.targetDist} onChange={e => setNewShoe({ ...newShoe, targetDist: e.target.value })} placeholder="Max km" className="flex-1 bg-background border border-white/10 rounded-md p-2 text-white" />
+              <input type="number" value={newShoe.startDist} onChange={e => setNewShoe({ ...newShoe, startDist: e.target.value })} placeholder="Start km" className="flex-1 bg-background border border-white/10 rounded-md p-2 text-text" />
+              <input type="number" value={newShoe.targetDist} onChange={e => setNewShoe({ ...newShoe, targetDist: e.target.value })} placeholder="Max km" className="flex-1 bg-background border border-white/10 rounded-md p-2 text-text" />
             </div>
             <button type="submit" className="w-full bg-primary text-white py-2 rounded-md font-medium">Add Shoe</button>
           </form>
@@ -833,7 +835,7 @@ function ProfileView({ user, profile }) {
             {shoes.map(shoe => (
               <div key={shoe.id} className="bg-surface p-4 rounded-xl border border-white/5">
                 <div className="flex justify-between mb-2">
-                  <span className="font-medium text-white">{shoe.name}</span>
+                  <span className="font-medium text-text">{shoe.name}</span>
                   <span className="text-sm text-secondary font-display">{shoe.currentMileage} / {shoe.targetMileage} km</span>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
@@ -857,6 +859,21 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(TABS.FEED);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'light') {
+      root.classList.add('light-mode');
+    } else {
+      root.classList.remove('light-mode');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   useEffect(() => {
     if (isMock) {
@@ -892,8 +909,19 @@ export default function App() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-background text-white font-sans selection:bg-primary/30">
-      <main className="max-w-md mx-auto min-h-screen relative shadow-2xl bg-background border-x border-white/5">
+    <div className="min-h-screen bg-background text-text font-sans selection:bg-primary/30">
+      <main className="max-w-md mx-auto min-h-screen relative shadow-2xl bg-background border-x border-text/5 transition-colors duration-300">
+
+        {/* Header / Theme Toggle */}
+        <div className="absolute top-4 right-4 z-20">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full bg-surface border border-white/10 text-secondary hover:text-primary transition-colors shadow-lg"
+            aria-label="Toggle Theme"
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+        </div>
 
         {isMock && (
           <div className="bg-orange-500/20 text-orange-400 text-xs p-1 text-center font-bold">
