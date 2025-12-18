@@ -26,7 +26,10 @@ import {
   TrendingUp,
   AlertTriangle,
   Sun,
-  Moon
+  Moon,
+  Music,
+  Filter,
+  X
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { clsx } from 'clsx';
@@ -75,13 +78,36 @@ const MOCK_DATA = {
   ],
   groups: [
     {
-      id: 'g1', groupName: 'Morning Milers', members: ['mock-user-123', 'u2', 'u3'], leaderboard: [
+      id: 'g1',
+      groupName: 'Morning Milers',
+      members: ['mock-user-123', 'u2', 'u3'],
+      leaderboard: [
         { username: 'Sarah Run', distance: 25.4 },
         { username: 'Guest Runner', distance: 15.2 },
         { username: 'Mike Track', distance: 10.0 }
-      ]
+      ],
+      // New fields
+      raceLength: '5k',
+      pace: '5:00/km',
+      longRunDay: 'Saturday',
+      runTerrain: 'Road',
+      raceTerrain: 'Road',
+      shoeBrand: 'Nike',
+      startTime: '06:00'
     },
-    { id: 'g2', groupName: 'Marathon Training', members: ['u2'], leaderboard: [] }
+    {
+      id: 'g2',
+      groupName: 'Marathon Training',
+      members: ['u2'],
+      leaderboard: [],
+      raceLength: 'Marathon',
+      pace: '5:30/km',
+      longRunDay: 'Sunday',
+      runTerrain: 'Mixed',
+      raceTerrain: 'Road',
+      shoeBrand: 'Brooks',
+      startTime: '07:00'
+    }
   ],
   messages: [
     { id: 'm1', userId: 'u2', username: 'Sarah Run', text: 'Great run everyone!', timestamp: new Date(Date.now() - 86400000) },
@@ -95,7 +121,8 @@ const MOCK_DATA = {
     trainingGoal: 'General Fitness',
     shoeTracker: [
       { id: 's1', name: 'Ghost 15', startMileage: 50, targetMileage: 800 }
-    ]
+    ],
+    musicAnthem: 'Eye of the Tiger - Survivor'
   }
 };
 
@@ -338,7 +365,25 @@ function GroupsView({ user, profile }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [showCreateGroup, setShowCreateGroup] = useState(false);
-  const [newGroupName, setNewGroupName] = useState('');
+  const [newGroupData, setNewGroupData] = useState({
+    groupName: '',
+    raceLength: '5k',
+    pace: '',
+    longRunDay: 'Saturday',
+    runTerrain: 'Road',
+    raceTerrain: 'Road',
+    shoeBrand: '',
+    startTime: ''
+  });
+
+  // Filter States
+  const [filters, setFilters] = useState({
+    raceLength: '',
+    runTerrain: '',
+    longRunDay: '',
+    shoeBrand: ''
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -373,34 +418,43 @@ function GroupsView({ user, profile }) {
 
   const handleCreateGroup = async (e) => {
     e.preventDefault();
-    if (!user || !newGroupName.trim()) return;
+    if (!user || !newGroupData.groupName.trim()) return;
+
+    const groupPayload = {
+      ...newGroupData,
+      members: [user.uid],
+      leaderboard: []
+    };
 
     if (isMock) {
       const newGroup = {
         id: Date.now().toString(),
-        groupName: newGroupName,
-        members: [user.uid],
-        leaderboard: []
+        ...groupPayload
       };
       setGroups(prev => [...prev, newGroup]);
       setShowCreateGroup(false);
-      setNewGroupName('');
+      setNewGroupData({ groupName: '', raceLength: '5k', pace: '', longRunDay: 'Saturday', runTerrain: 'Road', raceTerrain: 'Road', shoeBrand: '', startTime: '' });
       return;
     }
 
     try {
-      await addDoc(collection(db, `artifacts/${appId}/public/data/groups`), {
-        groupName: newGroupName,
-        members: [user.uid],
-        leaderboard: []
-      });
+      await addDoc(collection(db, `artifacts/${appId}/public/data/groups`), groupPayload);
       setShowCreateGroup(false);
-      setNewGroupName('');
+      setNewGroupData({ groupName: '', raceLength: '5k', pace: '', longRunDay: 'Saturday', runTerrain: 'Road', raceTerrain: 'Road', shoeBrand: '', startTime: '' });
     } catch (err) {
       console.error(err);
       alert("Error creating group");
     }
   };
+
+  // Filter Logic
+  const filteredGroups = groups.filter(g => {
+    if (filters.raceLength && g.raceLength !== filters.raceLength) return false;
+    if (filters.runTerrain && g.runTerrain !== filters.runTerrain) return false;
+    if (filters.longRunDay && g.longRunDay !== filters.longRunDay) return false;
+    if (filters.shoeBrand && g.shoeBrand && !g.shoeBrand.toLowerCase().includes(filters.shoeBrand.toLowerCase())) return false;
+    return true;
+  });
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -501,37 +555,152 @@ function GroupsView({ user, profile }) {
         </button>
       </div>
 
+      {/* Filter Bar */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={cn("flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors", showFilters ? "bg-primary text-white border-primary" : "bg-surface border-text/10 text-secondary hover:border-primary")}
+        >
+          <Filter size={14} /> Filters
+        </button>
+        {Object.values(filters).some(Boolean) && (
+          <button onClick={() => setFilters({ raceLength: '', runTerrain: '', longRunDay: '', shoeBrand: '' })} className="text-xs text-red-400 flex items-center gap-1">
+            <X size={12} /> Clear
+          </button>
+        )}
+      </div>
+
+      {showFilters && (
+        <div className="bg-surface p-4 rounded-xl border border-text/10 space-y-3 animate-in fade-in slide-in-from-top-2">
+          <div className="grid grid-cols-2 gap-3">
+            <select
+              value={filters.raceLength} onChange={e => setFilters({ ...filters, raceLength: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none"
+            >
+              <option value="">Any Distance</option>
+              <option value="5k">5k</option>
+              <option value="10k">10k</option>
+              <option value="Half Marathon">Half Marathon</option>
+              <option value="Marathon">Marathon</option>
+              <option value="Ultra">Ultra</option>
+            </select>
+            <select
+              value={filters.runTerrain} onChange={e => setFilters({ ...filters, runTerrain: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none"
+            >
+              <option value="">Any Terrain</option>
+              <option value="Road">Road</option>
+              <option value="Trail">Trail</option>
+              <option value="Track">Track</option>
+              <option value="Mixed">Mixed</option>
+            </select>
+            <select
+              value={filters.longRunDay} onChange={e => setFilters({ ...filters, longRunDay: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none"
+            >
+              <option value="">Any Day</option>
+              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+            <input
+              placeholder="Results for Shoe Brand..."
+              value={filters.shoeBrand} onChange={e => setFilters({ ...filters, shoeBrand: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none placeholder:text-secondary/50"
+            />
+          </div>
+        </div>
+      )}
+
       {showCreateGroup && (
-        <form onSubmit={handleCreateGroup} className="bg-surface p-4 rounded-xl border border-white/10 flex gap-2">
+        <form onSubmit={handleCreateGroup} className="bg-surface p-4 rounded-xl border border-text/10 space-y-3">
+          <h3 className="font-bold text-text">Create New Group</h3>
           <input
-            value={newGroupName}
-            onChange={e => setNewGroupName(e.target.value)}
-            className="flex-1 bg-background border border-white/10 rounded-md p-2 text-text focus:border-primary outline-none"
+            value={newGroupData.groupName}
+            onChange={e => setNewGroupData({ ...newGroupData, groupName: e.target.value })}
+            className="w-full bg-background border border-text/10 rounded-md p-2 text-text focus:border-primary outline-none"
             placeholder="Group Name"
             required
           />
-          <button type="submit" className="bg-primary px-4 py-2 rounded-md text-white font-medium">Create</button>
+          <div className="grid grid-cols-2 gap-2">
+            <select
+              value={newGroupData.raceLength} onChange={e => setNewGroupData({ ...newGroupData, raceLength: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none"
+            >
+              <option value="5k">5k</option>
+              <option value="10k">10k</option>
+              <option value="Half Marathon">Half Marathon</option>
+              <option value="Marathon">Marathon</option>
+              <option value="Ultra">Ultra</option>
+            </select>
+            <input
+              value={newGroupData.pace}
+              onChange={e => setNewGroupData({ ...newGroupData, pace: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none"
+              placeholder="Pace (e.g. 5:00/km)"
+            />
+            <select
+              value={newGroupData.runTerrain} onChange={e => setNewGroupData({ ...newGroupData, runTerrain: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none"
+            >
+              <option value="Road">Road</option>
+              <option value="Trail">Trail</option>
+              <option value="Track">Track</option>
+              <option value="Mixed">Mixed</option>
+            </select>
+            <select
+              value={newGroupData.longRunDay} onChange={e => setNewGroupData({ ...newGroupData, longRunDay: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none"
+            >
+              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+            <input
+              value={newGroupData.shoeBrand}
+              onChange={e => setNewGroupData({ ...newGroupData, shoeBrand: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none"
+              placeholder="Shoe Brand Preference"
+            />
+            <input
+              type="time"
+              value={newGroupData.startTime}
+              onChange={e => setNewGroupData({ ...newGroupData, startTime: e.target.value })}
+              className="bg-background border border-text/10 rounded-md p-2 text-xs text-text outline-none"
+            />
+          </div>
+          <button type="submit" className="w-full bg-primary px-4 py-2 rounded-md text-white font-medium">Create Group</button>
         </form>
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        {groups.length === 0 ? (
+        {filteredGroups.length === 0 ? (
           <div className="bg-surface p-8 rounded-xl border border-white/5 text-center">
-            <p className="text-secondary">You haven't joined any groups yet.</p>
-            <p className="text-secondary text-xs mt-2">Create one to get started!</p>
+            <p className="text-secondary">No groups match your filters.</p>
+            <p className="text-secondary text-xs mt-2">Try adjusting the filters or create a new one!</p>
           </div>
         ) : (
-          groups.map(group => (
+          filteredGroups.map(group => (
             <div
               key={group.id}
               onClick={() => setActiveGroup(group)}
-              className="bg-surface p-4 rounded-xl border border-white/5 hover:border-primary/50 transition-colors cursor-pointer flex justify-between items-center"
+              className="bg-surface p-4 rounded-xl border border-white/5 hover:border-primary/50 transition-colors cursor-pointer space-y-3"
             >
-              <div>
-                <h3 className="font-bold text-text">{group.groupName}</h3>
-                <p className="text-xs text-secondary">{group.members?.length || 0} Members</p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-bold text-text text-lg">{group.groupName}</h3>
+                  <p className="text-xs text-secondary">{group.members?.length || 0} Members</p>
+                </div>
+                <Users size={20} className="text-secondary" />
               </div>
-              <Users size={20} className="text-secondary" />
+
+              {/* Group Tags */}
+              <div className="flex flex-wrap gap-2 text-[10px] text-secondary">
+                {group.raceLength && <span className="bg-primary/10 text-primary px-2 py-1 rounded-full">{group.raceLength}</span>}
+                {group.pace && <span className="bg-text/5 px-2 py-1 rounded-full flex items-center gap-1"><Clock size={10} /> {group.pace}</span>}
+                {group.longRunDay && <span className="bg-text/5 px-2 py-1 rounded-full">{group.longRunDay}s</span>}
+                {group.runTerrain && <span className="bg-text/5 px-2 py-1 rounded-full">{group.runTerrain}</span>}
+              </div>
             </div>
           ))
         )}
@@ -792,6 +961,36 @@ function ProfileView({ user, profile }) {
           <h1 className="text-xl font-bold text-text">{localProfile?.username || user?.email?.split('@')[0] || 'Runner'}</h1>
           <p className="text-secondary text-sm">{localProfile?.trainingGoal || 'No Goal Set'}</p>
         </div>
+      </div>
+
+      {/* Music Section */}
+      <div className="bg-surface p-4 rounded-xl border border-text/10 flex items-center gap-4">
+        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <Music size={20} className="text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-bold text-secondary uppercase tracking-wider">Running Anthem</h3>
+          <p className="text-lg font-display text-text truncate">
+            {localProfile?.musicAnthem || "No anthem set"}
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            const newAnthem = prompt("Enter your running anthem (Song or Playlist URL):", localProfile?.musicAnthem || "");
+            if (newAnthem !== null) {
+              if (isMock) {
+                setLocalProfile(prev => ({ ...prev, musicAnthem: newAnthem }));
+              } else if (user) {
+                const ref = doc(db, `artifacts/${appId}/users/${user.uid}/profiles/${user.uid}`);
+                setDoc(ref, { musicAnthem: newAnthem }, { merge: true });
+                setLocalProfile(prev => ({ ...prev, musicAnthem: newAnthem }));
+              }
+            }
+          }}
+          className="p-2 rounded-full hover:bg-white/10 text-secondary hover:text-primary transition-colors"
+        >
+          <span className="text-xs font-medium">Edit</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
