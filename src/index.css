@@ -1,30 +1,38 @@
 @import "tailwindcss";
 
-/* Orbitron (for numbers) and Alumni Sans Pinstripe (for text) */
-@import url('https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Orbitron:wght@400..900&display=swap');
+/* 
+  NTS Brutalist Font Stack
+  - Inter Tight (Headings, bold sane-serif)
+  - Roboto Condensed (Subheadings, UI elements)
+  - JetBrains Mono (Technical data, metrics)
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap');
 
 :root {
-  /* Default Theme (Dark Mode) */
-  --bg-color: #0D0D0D;
-  --surface-color: #1A1A1A;
-  --primary-color: #0028ff;
+  /* Default (Dark Mode) - Strict Brutalist Palette */
+  --bg-color: #000000;
+  --surface-color: #000000;
+  --primary-color: #1E90FF;
+  /* Dodger Blue - High Energy */
   --text-color: #FFFFFF;
-  --secondary-color: #999999;
+  --border-color: #FFFFFF;
+  --secondary-color: #cecece;
+  /* Off-white/Gray for secondary text */
+
+  /* Layout */
+  --border-width: 2px;
 }
 
-/* Light Mode Override */
-/* Light Mode Override */
-html.light-mode {
-  --bg-color: #F2F4F7;
-  /* Clean light gray/white */
+/* Light Mode Overrides */
+.light-mode {
+  --bg-color: #FFFFFF;
   --surface-color: #FFFFFF;
-  /* White cards */
-  --primary-color: #0028ff;
-  /* Keep RoadRunner Blue */
+  --primary-color: #1E90FF;
+  /* Keep Blue or Invert? Keeping for consistency */
   --text-color: #000000;
-  /* Pure Black text */
-  --secondary-color: #4B5563;
-  /* Darker gray for secondary text in light mode */
+  --border-color: #000000;
+  --secondary-color: #4a4a4a;
+  /* Dark Gray for secondary text */
 }
 
 @theme {
@@ -32,29 +40,74 @@ html.light-mode {
   --color-surface: var(--surface-color);
   --color-primary: var(--primary-color);
   --color-text: var(--text-color);
+  --color-border-bright: var(--border-color);
   --color-secondary: var(--secondary-color);
 
-  --font-sans: "Alumni Sans Pinstripe", sans-serif;
-  --font-display: "Orbitron", sans-serif;
+  --font-sans: "Inter Tight", sans-serif;
+  --font-condensed: "Roboto Condensed", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
-  /* Alumni Sans Pinstripe is extremely condensed and small/thin. 
-     We need to aggressively bump up the standard sizes to make it legible. */
-  --text-xs: 1.1rem;
-  --text-sm: 1.25rem;
-  --text-base: 1.5rem;
-  --text-lg: 1.75rem;
-  --text-xl: 2rem;
-  --text-2xl: 2.25rem;
-  --text-3xl: 2.5rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 3rem;
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-text);
-  font-family: var(--font-sans);
-  font-size: var(--text-base);
+  font-family: var(--font-condensed);
+  /* Default to condensed for that technical feel */
   font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Alumni Sans Pinstripe is condensed/thin, bumping size slightly helps readability */
+/* Global Reset overrides for Brutalist feel */
+button {
+  border-radius: 0 !important;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* Scanline / Grid Background Utility */
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(var(--border-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  stroke: var(--border-color);
+  /* For SVG if used, else CSS gradients use color logic above */
+  opacity: 0.05;
+  /* Subtle grid */
+}
+
+/* Ensure grid dots/lines invert with theme */
+.light-mode .bg-grid-pattern {
+  opacity: 0.1;
+  /* Slightly stronger in light mode for visibility */
+}
+
+.scanlines {
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0) 50%,
+      rgba(0, 0, 0, 0.1) 50%,
+      rgba(0, 0, 0, 0.1));
+  background-size: 100% 4px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.3;
+}
