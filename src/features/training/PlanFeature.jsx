@@ -33,6 +33,41 @@ export default function PlanFeature({ user, profile, onUpdateProfile }) {
     };
 
     const getPlan = (goal, sportFocus = 'RUNNING') => {
+        if (sportFocus === 'WORKOUT') {
+            switch (goal) {
+                case 'Short Distance': // Power / HIIT focus
+                    return [
+                        { day: 'MON', type: 'UPPER BODY', desc: 'Explosive Push/Pull + 15min HIIT' },
+                        { day: 'TUE', type: 'CORE', desc: 'Weighted Plank + Russian Twists + Leg Raises' },
+                        { day: 'WED', type: 'LOWER BODY', desc: 'Box Jumps + Goblet Squats + Plyo' },
+                        { day: 'THU', type: 'REST', desc: 'Total Recovery' },
+                        { day: 'FRI', type: 'BARS', desc: 'Pull-ups + Dips + Hang Practice' },
+                        { day: 'SAT', type: 'FULL BODY', desc: 'Kettlebell Complex: Clean/Press/Swing' },
+                        { day: 'SUN', type: 'REST', desc: 'Total Rest' },
+                    ];
+                case 'Long Distance': // Hypertrophy / Volume focus
+                    return [
+                        { day: 'MON', type: 'UPPER BODY', desc: 'Bench Press + Rows + Accessories (4x12)' },
+                        { day: 'TUE', type: 'LOWER BODY', desc: 'Deadlifts + Squats + Lunges (4x10)' },
+                        { day: 'WED', type: 'REST', desc: 'Rest / Light Mobility' },
+                        { day: 'THU', type: 'UPPER BODY', desc: 'Overhead Press + Lat Pulls + Arms' },
+                        { day: 'FRI', type: 'CORE/LEGS', desc: 'Weighted Core + Calves + Hamstrings' },
+                        { day: 'SAT', type: 'VOLUME', desc: 'Mixed Weights: Full Body Burnout' },
+                        { day: 'SUN', type: 'REST', desc: 'Total Rest' },
+                    ];
+                default: // General Fitness
+                    return [
+                        { day: 'MON', type: 'FREE WEIGHTS', desc: 'Dumbbell Full Body Circuit' },
+                        { day: 'TUE', type: 'CORE', desc: '15min Dedicated Core Protocol' },
+                        { day: 'WED', type: 'REST', desc: 'Rest Day' },
+                        { day: 'THU', type: 'KETTLEBELLS', desc: 'Swings + TGU + Snatches' },
+                        { day: 'FRI', type: 'UPPER BODY', desc: 'Pushups + Pullups + Bodyweight' },
+                        { day: 'SAT', type: 'ACTIVE', desc: 'Outdoor Activity or Yoga' },
+                        { day: 'SUN', type: 'REST', desc: 'Rest Day' },
+                    ];
+            }
+        }
+
         if (sportFocus === 'HYROX') {
             switch (goal) {
                 case 'Short Distance':

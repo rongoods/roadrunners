@@ -106,18 +106,18 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                     onClick={() => setShowLogForm(!showLogForm)}
                     className="bg-primary hover:bg-white text-black text-sm font-bold px-4 py-2 uppercase border-2 border-transparent hover:border-black transition-colors"
                 >
-                    {showLogForm ? 'CANCEL' : 'LOG RUN +'}
+                    {showLogForm ? 'CANCEL' : 'LOG ACTIVITY +'}
                 </button>
             </div>
 
             {/* Filter Menu */}
-            <div className="flex border-y-2 border-border-bright bg-background sticky top-8 z-30">
-                {['RUNNING', 'HYROX', 'MIXED'].map((filter) => (
+            <div className="flex border-y-2 border-border-bright bg-background sticky top-8 z-30 overflow-x-auto no-scrollbar">
+                {['RUNNING', 'HYROX', 'WORKOUT', 'MIXED'].map((filter) => (
                     <button
                         key={filter}
                         onClick={() => setActiveFilter(filter)}
                         className={cn(
-                            "flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-colors border-r-2 last:border-r-0 border-border-bright",
+                            "flex-1 min-w-[100px] py-3 text-[10px] font-black uppercase tracking-widest transition-colors border-r-2 last:border-r-0 border-border-bright",
                             activeFilter === filter
                                 ? "bg-primary text-black"
                                 : "hover:bg-white/5 text-secondary"
@@ -180,7 +180,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                     <div>
                         <label className="text-xs uppercase text-secondary mb-1 block">Activity Type</label>
                         <div className="flex gap-2">
-                            {['RUN', 'HYROX'].map(type => (
+                            {['RUN', 'HYROX', 'WORKOUT'].map(type => (
                                 <button
                                     key={type}
                                     type="button"
@@ -237,6 +237,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                             if (activeFilter === 'MIXED') return true;
                             if (activeFilter === 'RUNNING') return run.activityType === 'RUN';
                             if (activeFilter === 'HYROX') return run.activityType === 'HYROX';
+                            if (activeFilter === 'WORKOUT') return run.activityType === 'WORKOUT';
                             return true;
                         })
                         .map(run => (

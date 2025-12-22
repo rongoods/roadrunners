@@ -162,6 +162,7 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                             >
                                 <option value="RUNNING">RUNNING focus</option>
                                 <option value="HYROX">HYROX focus</option>
+                                <option value="WORKOUT">WORKOUT focus</option>
                                 <option value="MIXED">MIXED (ALL)</option>
                             </select>
                         ) : (

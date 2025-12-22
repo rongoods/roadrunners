@@ -21,7 +21,8 @@ export default function GroupsFeature({ user, profile }) {
         raceTerrain: 'Road',
         shoeBrand: '',
         startTime: '',
-        sportType: 'RUNNING' // Default for groups
+        sportType: 'RUNNING', // Default for groups
+        workoutCategory: '' // Optional category for WORKOUT type
     });
 
     // Filter States
@@ -322,14 +323,14 @@ export default function GroupsFeature({ user, profile }) {
                         </div>
                         <div className="col-span-2">
                             <label className="text-[10px] uppercase text-secondary block mb-1">Sport Type</label>
-                            <div className="flex gap-2">
-                                {['RUNNING', 'HYROX'].map(type => (
+                            <div className="flex flex-wrap gap-2">
+                                {['RUNNING', 'HYROX', 'WORKOUT'].map(type => (
                                     <button
                                         key={type}
                                         type="button"
                                         onClick={() => setNewGroupData({ ...newGroupData, sportType: type })}
                                         className={cn(
-                                            "flex-1 py-2 text-[10px] font-bold uppercase border-2 transition-colors",
+                                            "flex-1 min-w-[30%] py-2 text-[10px] font-bold uppercase border-2 transition-colors",
                                             newGroupData.sportType === type
                                                 ? "bg-primary text-black border-primary"
                                                 : "bg-background text-text border-border-bright hover:bg-white/5"
@@ -340,6 +341,27 @@ export default function GroupsFeature({ user, profile }) {
                                 ))}
                             </div>
                         </div>
+
+                        {newGroupData.sportType === 'WORKOUT' && (
+                            <div className="col-span-2">
+                                <label className="text-[10px] uppercase text-secondary block mb-1">Workout Category</label>
+                                <select
+                                    value={newGroupData.workoutCategory}
+                                    onChange={e => setNewGroupData({ ...newGroupData, workoutCategory: e.target.value })}
+                                    className="w-full"
+                                    required
+                                >
+                                    <option value="">SELECT SPECIALIZATION...</option>
+                                    <option value="GENERAL">GENERAL</option>
+                                    <option value="FREE WEIGHTS">FREE WEIGHTS</option>
+                                    <option value="KETTLEBELLS">KETTLEBELLS</option>
+                                    <option value="BARS">BARS</option>
+                                    <option value="CORE">CORE</option>
+                                    <option value="UPPER BODY">UPPER BODY</option>
+                                    <option value="LOWER BODY">LOWER BODY</option>
+                                </select>
+                            </div>
+                        )}
                     </div>
                     <button type="submit" className="w-full bg-text text-background border-2 border-text py-2 font-black uppercase hover:bg-background hover:text-text transition-colors">
                         INITIALIZE GROUP
@@ -369,9 +391,10 @@ export default function GroupsFeature({ user, profile }) {
                                         {group.sportType && (
                                             <span className={cn(
                                                 "text-[8px] font-bold px-1 uppercase",
-                                                group.sportType === 'HYROX' ? "bg-secondary text-background" : "bg-primary text-black"
+                                                group.sportType === 'HYROX' ? "bg-secondary text-background" :
+                                                    group.sportType === 'WORKOUT' ? "bg-text text-background" : "bg-primary text-black"
                                             )}>
-                                                {group.sportType}
+                                                {group.sportType} {group.workoutCategory && `// ${group.workoutCategory}`}
                                             </span>
                                         )}
                                     </div>
