@@ -17,7 +17,8 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
         date: formatDate(new Date(), 'yyyy-MM-dd'),
         shoeId: '',
         route: [],
-        activityType: 'RUN' // Default to RUN
+        activityType: 'RUN', // Default to RUN
+        workoutDescription: ''
     });
     const [showTraceMap, setShowTraceMap] = useState(false);
     const [activeFilter, setActiveFilter] = useState(profile?.sportFocus || 'MIXED');
@@ -48,20 +49,31 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
 
         const dist = parseFloat(newRun.distance);
         const dur = parseFloat(newRun.duration);
-        if (!dist || !dur) return;
-        const pace = (dur / dist).toFixed(2);
+
+        const isHybridType = newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX';
+
+        // Validation: Need at least a description or distance/duration for hybrid types
+        if (isHybridType && !newRun.workoutDescription.trim() && !dist) {
+            return alert("Please enter session details or stats.");
+        }
+        if (!isHybridType && (!dist || !dur)) {
+            return alert("Please enter distance and duration.");
+        }
+
+        const pace = (dist && dur) ? (dur / dist).toFixed(2) : 0;
 
         const runData = {
             userId: user.uid,
             username: profile?.username || user.email?.split('@')[0] || 'Runner',
-            distanceKm: dist,
-            durationMinutes: dur,
+            distanceKm: dist || 0,
+            durationMinutes: dur || 0,
             paceMinPerKm: parseFloat(pace),
             date: newRun.date,
             shoeId: newRun.shoeId || null,
             shoeName: profile?.shoeTracker?.find(s => s.id === newRun.shoeId)?.name || null,
             route: newRun.route || [],
             activityType: newRun.activityType,
+            workoutDescription: newRun.workoutDescription || null,
             kudosCount: 0,
             timestamp: new Date()
         };
@@ -70,7 +82,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
             setRuns(prev => [{ id: Date.now().toString(), ...runData }, ...prev]);
             setShowLogForm(false);
             setShowTraceMap(false);
-            setNewRun({ distance: '', duration: '', date: formatDate(new Date(), 'yyyy-MM-dd'), shoeId: '', route: [] });
+            setNewRun({ distance: '', duration: '', date: formatDate(new Date(), 'yyyy-MM-dd'), shoeId: '', route: [], activityType: 'RUN', workoutDescription: '' });
             return;
         }
 
@@ -78,7 +90,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
             await addDoc(collection(db, `artifacts/${appId}/public/data/runs`), runData);
             setShowLogForm(false);
             setShowTraceMap(false);
-            setNewRun({ distance: '', duration: '', date: formatDate(new Date(), 'yyyy-MM-dd'), shoeId: '', route: [], activityType: 'RUN' });
+            setNewRun({ distance: '', duration: '', date: formatDate(new Date(), 'yyyy-MM-dd'), shoeId: '', route: [], activityType: 'RUN', workoutDescription: '' });
         } catch (err) {
             console.error("Error adding run: ", err);
             alert("Failed to post run. Check permissions.");
@@ -131,23 +143,43 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
             {showLogForm && (
                 <form onSubmit={handleLogRun} className="mx-4 bg-background border-2 border-border-bright p-4 space-y-4">
                     <h3 className="font-bold text-lg uppercase border-b border-border-bright pb-2">New Entry</h3>
+                    {(newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX') && (
+                        <div className="border-2 border-primary p-3 bg-primary/5">
+                            <label className="text-[10px] font-black uppercase text-primary mb-2 block tracking-widest">
+                                {newRun.activityType === 'HYROX' ? 'HYROX STATIONS / DETAILS' : 'Workout Details / Manifest'}
+                            </label>
+                            <textarea
+                                value={newRun.workoutDescription}
+                                onChange={e => setNewRun({ ...newRun, workoutDescription: e.target.value })}
+                                placeholder={newRun.activityType === 'HYROX' ? "E.G. 1000M ROW, 80M BURPEES, 100M LUNGES..." : "E.G. 5X5 BACK SQUATS, CORE CIRCUIT, KETTLEBELL FLOW..."}
+                                className="w-full bg-background border border-primary p-2 text-xs text-text focus:border-white outline-none font-mono uppercase min-h-[80px]"
+                            />
+                        </div>
+                    )}
+
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-xs uppercase text-secondary mb-1 block">Distance (km)</label>
+                            <label className="text-[10px] font-bold uppercase text-secondary mb-1 block">
+                                {(newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX') ? 'Run / Interval (KM)' : 'Distance (KM)'}
+                            </label>
                             <input
-                                type="number" step="0.01" required
+                                type="number" step="0.01"
                                 value={newRun.distance}
                                 onChange={e => setNewRun({ ...newRun, distance: e.target.value })}
                                 className="w-full bg-background border-2 border-border-bright p-2 text-text focus:border-primary outline-none font-mono"
+                                placeholder="OPTIONAL"
                             />
                         </div>
                         <div>
-                            <label className="text-xs uppercase text-secondary mb-1 block">Duration (min)</label>
+                            <label className="text-[10px] font-bold uppercase text-secondary mb-1 block">
+                                {(newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX') ? 'Total Time (MIN)' : 'Duration (MIN)'}
+                            </label>
                             <input
-                                type="number" step="1" required
+                                type="number" step="1"
                                 value={newRun.duration}
                                 onChange={e => setNewRun({ ...newRun, duration: e.target.value })}
                                 className="w-full bg-background border-2 border-border-bright p-2 text-text focus:border-primary outline-none font-mono"
+                                placeholder="OPTIONAL"
                             />
                         </div>
                     </div>
@@ -272,20 +304,28 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-3 gap-0 border-2 border-current mb-4">
-                                    <div className="p-2 border-r-2 border-current text-center">
-                                        <p className="text-2xl font-mono font-bold leading-none">{run.distanceKm}</p>
-                                        <p className="text-[9px] uppercase tracking-widest opacity-80">KM</p>
+                                {run.workoutDescription && (
+                                    <div className="mb-4 p-3 bg-white/5 border-l-4 border-primary font-mono text-sm uppercase tracking-tight leading-relaxed">
+                                        {run.workoutDescription}
                                     </div>
-                                    <div className="p-2 border-r-2 border-current text-center">
-                                        <p className="text-2xl font-mono font-bold leading-none">{run.paceMinPerKm}</p>
-                                        <p className="text-[9px] uppercase tracking-widest opacity-80">MIN/KM</p>
+                                )}
+
+                                {(run.distanceKm > 0 || run.durationMinutes > 0) && (
+                                    <div className="grid grid-cols-3 gap-0 border-2 border-current mb-4">
+                                        <div className="p-2 border-r-2 border-current text-center">
+                                            <p className="text-2xl font-mono font-bold leading-none">{run.distanceKm}</p>
+                                            <p className="text-[9px] uppercase tracking-widest opacity-80">KM</p>
+                                        </div>
+                                        <div className="p-2 border-r-2 border-current text-center">
+                                            <p className="text-2xl font-mono font-bold leading-none">{run.paceMinPerKm}</p>
+                                            <p className="text-[9px] uppercase tracking-widest opacity-80">MIN/KM</p>
+                                        </div>
+                                        <div className="p-2 text-center">
+                                            <p className="text-2xl font-mono font-bold leading-none">{run.durationMinutes}</p>
+                                            <p className="text-[9px] uppercase tracking-widest opacity-80">MIN</p>
+                                        </div>
                                     </div>
-                                    <div className="p-2 text-center">
-                                        <p className="text-2xl font-mono font-bold leading-none">{run.durationMinutes}</p>
-                                        <p className="text-[9px] uppercase tracking-widest opacity-80">MIN</p>
-                                    </div>
-                                </div>
+                                )}
 
                                 <div className="flex justify-between items-center px-1">
                                     <div className="text-[10px] font-mono opacity-50 uppercase">
