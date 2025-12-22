@@ -149,7 +149,7 @@ export default function PlanFeature({ user, profile, onUpdateProfile }) {
 
     if (!profile?.trainingGoal || isEditing) {
         return (
-            <div className="p-0 space-y-8 pb-24">
+            <div className="p-0 pb-24">
                 <div className="px-4 border-b-2 border-border-bright pb-4">
                     <h1 className="text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5">
                         Protocol<br />Setup
@@ -192,7 +192,7 @@ export default function PlanFeature({ user, profile, onUpdateProfile }) {
     const plan = getPlan(profile.trainingGoal, profile.sportFocus);
 
     return (
-        <div className="p-0 space-y-8 pb-24">
+        <div className="p-0 pb-24">
             <div className="flex justify-between items-end px-4 border-b-2 border-border-bright pb-4">
                 <h1 className="text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5">
                     Weekly<br />Protocol
