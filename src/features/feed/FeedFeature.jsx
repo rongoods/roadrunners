@@ -108,7 +108,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
     };
 
     return (
-        <div className="p-0 space-y-8 pb-24">
+        <div className="p-0 pb-24">
             {/* Header Action */}
             <div className="flex justify-between items-end px-4 border-b-2 border-border-bright pb-4">
                 <h1 className="text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5">

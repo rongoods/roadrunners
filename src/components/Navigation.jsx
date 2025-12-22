@@ -12,7 +12,7 @@ export function Navigation({ activeTab, onTabChange }) {
 
     return (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t-2 border-border-bright h-14 flex items-center justify-between px-0">
-            <div className="flex h-full w-full">
+            <div className="flex h-full w-full max-w-7xl mx-auto px-0 border-x-2 border-transparent">
                 {tabs.map((tab, idx) => {
                     const isActive = activeTab === tab.id;
                     return (
