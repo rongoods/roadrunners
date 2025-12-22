@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { useState, useEffect, useCallback } from 'react';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db, isMock } from '../api/firebase';
 import { MOCK_DATA } from '../utils/constants';
 
@@ -11,7 +11,15 @@ export function useProfile(user) {
 
     useEffect(() => {
         if (!user) {
-            setProfile(null);
+            // Default Guest Profile
+            setProfile({
+                username: 'GUEST',
+                age: '',
+                weightKg: '',
+                trainingGoal: 'General Fitness',
+                sportFocus: 'MIXED',
+                shoeTracker: []
+            });
             setLoading(false);
             return;
         }
@@ -32,7 +40,14 @@ export function useProfile(user) {
             if (docSnap.exists()) {
                 setProfile(docSnap.data());
             } else {
-                setProfile(null);
+                setProfile({
+                    username: user.email?.split('@')[0] || 'RUNNER',
+                    age: '',
+                    weightKg: '',
+                    trainingGoal: 'General Fitness',
+                    sportFocus: 'MIXED',
+                    shoeTracker: []
+                });
             }
             setLoading(false);
         });
@@ -40,5 +55,19 @@ export function useProfile(user) {
         return () => unsubscribe();
     }, [user]);
 
-    return { profile, loading };
+    const updateProfile = useCallback(async (updates) => {
+        // Optimistic / Local Update
+        setProfile(prev => ({ ...prev, ...updates }));
+
+        if (user && !isMock && db) {
+            try {
+                const profileRef = doc(db, `artifacts/${appId}/users/${user.uid}/profiles/${user.uid}`);
+                await setDoc(profileRef, updates, { merge: true });
+            } catch (err) {
+                console.error("Failed to update profile in Firestore:", err);
+            }
+        }
+    }, [user]);
+
+    return { profile, loading, updateProfile };
 }

@@ -20,7 +20,8 @@ export default function GroupsFeature({ user, profile }) {
         runTerrain: 'Road',
         raceTerrain: 'Road',
         shoeBrand: '',
-        startTime: ''
+        startTime: '',
+        sportType: 'RUNNING' // Default for groups
     });
 
     // Filter States
@@ -110,6 +111,11 @@ export default function GroupsFeature({ user, profile }) {
             if (filters.timeOfDay === 'evening' && hour < 17) return false; // Evening: 17:00+
         }
 
+        if (profile?.sportFocus && profile.sportFocus !== 'MIXED') {
+            if (profile.sportFocus === 'RUNNING' && g.sportType === 'HYROX') return false;
+            if (profile.sportFocus === 'HYROX' && g.sportType === 'RUNNING') return false;
+        }
+
         return true;
     });
 
@@ -144,8 +150,8 @@ export default function GroupsFeature({ user, profile }) {
             <div className="flex flex-col h-[calc(100vh-80px)]">
                 {/* Active Group Header */}
                 <div className="p-4 border-b-2 border-border-bright flex items-center gap-4 bg-background sticky top-0 z-10">
-                    <button onClick={() => setActiveGroup(null)} className="text-sm font-bold uppercase hover:bg-text hover:text-background px-2 py-1 border border-transparent hover:border-border-bright transition-colors">
-                        ← BACK TO INDEX
+                    <button onClick={() => setActiveGroup(null)} className="text-sm font-bold uppercase bg-text text-background px-2 py-1 border-2 border-text hover:bg-background hover:text-text transition-colors">
+                        [← BACK TO INDEX]
                     </button>
                     <div className="flex-1">
                         <h2 className="text-2xl font-black uppercase tracking-tighter leading-none">{activeGroup.groupName}</h2>
@@ -212,8 +218,8 @@ export default function GroupsFeature({ user, profile }) {
                         placeholder="ENTER TRANSMISSION..."
                         className="flex-1 bg-background border border-border-bright px-4 py-3 text-sm focus:border-primary outline-none text-text font-mono uppercase"
                     />
-                    <button type="submit" className="bg-text px-4 py-2 text-background font-bold uppercase hover:bg-primary hover:text-black transition-colors text-xs border border-border-bright">
-                        SEND
+                    <button type="submit" className="bg-text px-4 py-2 text-background font-bold uppercase border-2 border-text hover:bg-background hover:text-text transition-colors text-xs">
+                        SEND TRANSMISSION
                     </button>
                 </form>
             </div>
@@ -228,9 +234,9 @@ export default function GroupsFeature({ user, profile }) {
                 </h1>
                 <button
                     onClick={() => setShowCreateGroup(!showCreateGroup)}
-                    className="bg-black hover:bg-white hover:text-black text-white text-sm font-bold px-4 py-2 uppercase border-2 border-white transition-colors"
+                    className="bg-text text-background text-sm font-bold px-4 py-2 uppercase border-2 border-text hover:bg-background hover:text-text transition-colors"
                 >
-                    {showCreateGroup ? 'CANCEL' : 'CREATE +'}
+                    {showCreateGroup ? 'ABORT' : 'CREATE +'}
                 </button>
             </div>
 
@@ -238,7 +244,7 @@ export default function GroupsFeature({ user, profile }) {
             <div className="px-4 flex flex-wrap gap-2">
                 <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className={cn("text-xs font-bold uppercase px-3 py-1 border-2 transition-colors", showFilters ? "bg-white text-black border-white" : "bg-black text-white border-white/30 hover:border-white")}
+                    className={cn("text-xs font-bold uppercase px-3 py-1 border-2 transition-colors", showFilters ? "bg-primary text-black border-primary" : "bg-text text-background border-text hover:bg-background hover:text-text")}
                 >
                     {showFilters ? '[-] HIDE FILTERS' : '[+] FILTERS'}
                 </button>
@@ -250,7 +256,7 @@ export default function GroupsFeature({ user, profile }) {
             </div>
 
             {showFilters && (
-                <div className="mx-4 p-4 border-2 border-border-bright space-y-3 bg-black">
+                <div className="mx-4 p-4 border-2 border-border-bright space-y-3 bg-background">
                     <div className="grid grid-cols-2 gap-3">
                         {[
                             { key: 'raceLength', options: ['5k', '10k', 'Half Marathon', 'Marathon', 'Ultra'], label: 'DISTANCE' },
@@ -262,7 +268,7 @@ export default function GroupsFeature({ user, profile }) {
                                 <label className="text-[10px] uppercase text-secondary block mb-1">{f.label}</label>
                                 <select
                                     value={filters[f.key]} onChange={e => setFilters({ ...filters, [f.key]: e.target.value })}
-                                    className="w-full bg-black border border-white/50 rounded-none p-2 text-xs text-white outline-none font-mono uppercase focus:border-primary"
+                                    className="w-full"
                                 >
                                     <option value="">ANY</option>
                                     {f.options.map(o => <option key={o} value={o}>{o.toUpperCase()}</option>)}
@@ -274,7 +280,7 @@ export default function GroupsFeature({ user, profile }) {
                             <input
                                 placeholder="SEARCH BRAND..."
                                 value={filters.shoeBrand} onChange={e => setFilters({ ...filters, shoeBrand: e.target.value })}
-                                className="w-full bg-black border border-white/50 p-2 text-xs text-white outline-none font-mono uppercase placeholder:text-gray-700 focus:border-primary"
+                                className="w-full bg-background border border-border-bright p-2 text-xs text-text outline-none font-mono uppercase placeholder:text-secondary focus:border-primary"
                             />
                         </div>
                     </div>
@@ -282,14 +288,14 @@ export default function GroupsFeature({ user, profile }) {
             )}
 
             {showCreateGroup && (
-                <form onSubmit={handleCreateGroup} className="mx-4 p-4 border-2 border-primary space-y-4 bg-black relative">
+                <form onSubmit={handleCreateGroup} className="mx-4 p-4 border-2 border-primary space-y-4 bg-background relative">
                     <div className="absolute top-0 right-0 bg-primary text-black text-[10px] font-bold px-1 uppercase">New Group</div>
                     <div>
                         <label className="text-[10px] uppercase text-secondary block mb-1">GROUP DESIGNATION</label>
                         <input
                             value={newGroupData.groupName}
                             onChange={e => setNewGroupData({ ...newGroupData, groupName: e.target.value })}
-                            className="w-full bg-black border-2 border-white p-2 text-white focus:border-primary outline-none font-bold uppercase"
+                            className="w-full bg-background border-2 border-border-bright p-2 text-text focus:border-primary outline-none font-bold uppercase"
                             required
                         />
                     </div>
@@ -300,7 +306,7 @@ export default function GroupsFeature({ user, profile }) {
                             <label className="text-[10px] uppercase text-secondary block mb-1">Target Dist</label>
                             <select
                                 value={newGroupData.raceLength} onChange={e => setNewGroupData({ ...newGroupData, raceLength: e.target.value })}
-                                className="w-full bg-black border border-white/50 p-2 text-xs font-mono uppercase"
+                                className="w-full"
                             >
                                 {['5k', '10k', 'Half Marathon', 'Marathon', 'Ultra'].map(o => <option key={o} value={o}>{o}</option>)}
                             </select>
@@ -310,13 +316,32 @@ export default function GroupsFeature({ user, profile }) {
                             <input
                                 value={newGroupData.pace}
                                 onChange={e => setNewGroupData({ ...newGroupData, pace: e.target.value })}
-                                className="w-full bg-black border border-white/50 p-2 text-xs font-mono uppercase"
+                                className="w-full bg-background border border-border-bright p-2 text-xs text-text font-mono uppercase"
                                 placeholder="MIN/KM"
                             />
                         </div>
-                        {/* Add other fields similarly... skipping strictly for space but enough for demo */}
+                        <div className="col-span-2">
+                            <label className="text-[10px] uppercase text-secondary block mb-1">Sport Type</label>
+                            <div className="flex gap-2">
+                                {['RUNNING', 'HYROX'].map(type => (
+                                    <button
+                                        key={type}
+                                        type="button"
+                                        onClick={() => setNewGroupData({ ...newGroupData, sportType: type })}
+                                        className={cn(
+                                            "flex-1 py-2 text-[10px] font-bold uppercase border-2 transition-colors",
+                                            newGroupData.sportType === type
+                                                ? "bg-primary text-black border-primary"
+                                                : "bg-background text-text border-border-bright hover:bg-white/5"
+                                        )}
+                                    >
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                    <button type="submit" className="w-full bg-white text-black border-2 border-white py-2 font-black uppercase hover:bg-primary transition-colors">
+                    <button type="submit" className="w-full bg-text text-background border-2 border-text py-2 font-black uppercase hover:bg-background hover:text-text transition-colors">
                         INITIALIZE GROUP
                     </button>
                 </form>
@@ -337,9 +362,19 @@ export default function GroupsFeature({ user, profile }) {
                             <div className="flex justify-between items-start mb-2">
                                 <div>
                                     <h3 className="font-black text-xl uppercase tracking-tight">{group.groupName}</h3>
-                                    <p className="text-[10px] font-mono border border-current inline-block px-1 mt-1">
-                                        ID: {group.id} // MEM: {group.members?.length || 0}
-                                    </p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <p className="text-[10px] font-mono border border-current inline-block px-1">
+                                            ID: {group.id} // MEM: {group.members?.length || 0}
+                                        </p>
+                                        {group.sportType && (
+                                            <span className={cn(
+                                                "text-[8px] font-bold px-1 uppercase",
+                                                group.sportType === 'HYROX' ? "bg-secondary text-background" : "bg-primary text-black"
+                                            )}>
+                                                {group.sportType}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity font-bold text-xs uppercase bg-black text-white px-2 py-1">
                                     ACCESS &rarr;

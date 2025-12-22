@@ -18,8 +18,9 @@ import './index.css';
 export default function App() {
   const [activeTab, setActiveTab] = useState(TABS.FEED);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [viewedUserId, setViewedUserId] = useState(null);
   const { user, signInWithGoogle, logout } = useAuth();
-  const { profile } = useProfile(user);
+  const { profile, updateProfile } = useProfile(user);
   const { theme, toggleTheme } = useTheme(); // Hook usage
 
   useEffect(() => {
@@ -28,6 +29,18 @@ export default function App() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const handleViewProfile = (userId) => {
+    setViewedUserId(userId);
+    setActiveTab(TABS.PROFILE);
+  };
+
+  const handleTabChange = (tab) => {
+    if (tab === TABS.PROFILE) {
+      setViewedUserId(null); // Reset when going to own profile via nav
+    }
+    setActiveTab(tab);
+  };
 
   return (
     <div className="min-h-screen bg-background text-text font-mono selection:bg-primary selection:text-black overflow-x-hidden">
@@ -52,13 +65,23 @@ export default function App() {
 
         <div className="mt-0 px-0">
           {/* Main Content Area */}
-          {activeTab === TABS.FEED && <FeedFeature user={user} profile={profile} />}
+          {activeTab === TABS.FEED && <FeedFeature user={user} profile={profile} onViewProfile={handleViewProfile} />}
           {activeTab === TABS.GROUPS && <GroupsFeature user={user} profile={profile} />}
-          {activeTab === TABS.PLAN && <PlanFeature user={user} profile={profile} />}
-          {activeTab === TABS.PROFILE && <ProfileFeature user={user} profile={profile} onLogin={signInWithGoogle} onLogout={logout} />}
+          {activeTab === TABS.PLAN && <PlanFeature user={user} profile={profile} onUpdateProfile={updateProfile} />}
+          {activeTab === TABS.PROFILE && (
+            <ProfileFeature
+              user={user}
+              profile={profile}
+              onUpdateProfile={updateProfile}
+              onLogin={signInWithGoogle}
+              onLogout={logout}
+              viewedUserId={viewedUserId}
+              onBack={() => setViewedUserId(null)}
+            />
+          )}
         </div>
 
-        <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+        <Navigation activeTab={activeTab} onTabChange={handleTabChange} />
       </main>
     </div>
   );

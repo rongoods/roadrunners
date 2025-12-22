@@ -4,61 +4,70 @@ import { db, isMock } from '../../api/firebase';
 
 const appId = window.__app_id || 'demo-app';
 
-export default function PlanFeature({ user, profile }) {
+export default function PlanFeature({ user, profile, onUpdateProfile }) {
     const [formData, setFormData] = useState({ age: '', weightKg: '', trainingGoal: 'General Fitness' });
     const [isEditing, setIsEditing] = useState(false);
-    const [localProfile, setLocalProfile] = useState(profile); // Local state override for mock mode
 
     useEffect(() => {
-        setLocalProfile(profile);
-    }, [profile]);
-
-    useEffect(() => {
-        if (localProfile) {
+        if (profile) {
             setFormData({
-                age: localProfile.age || '',
-                weightKg: localProfile.weightKg || '',
-                trainingGoal: localProfile.trainingGoal || 'General Fitness'
+                age: profile.age || '',
+                weightKg: profile.weightKg || '',
+                trainingGoal: profile.trainingGoal || 'General Fitness'
             });
         } else {
             setIsEditing(true);
         }
-    }, [localProfile]);
+    }, [profile]);
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
-        if (!user) return;
 
-        if (isMock) {
-            setLocalProfile(prev => ({
-                ...prev,
-                age: formData.age,
-                weightKg: formData.weightKg,
-                trainingGoal: formData.trainingGoal,
-                shoeTracker: prev?.shoeTracker || []
-            }));
-            setIsEditing(false);
-            return;
-        }
+        await onUpdateProfile({
+            age: formData.age,
+            weightKg: formData.weightKg,
+            trainingGoal: formData.trainingGoal
+        });
 
-        try {
-            const ref = doc(db, `artifacts/${appId}/users/${user.uid}/profiles/${user.uid}`);
-            await setDoc(ref, {
-                userId: user.uid,
-                username: profile?.username || user.email?.split('@')[0],
-                age: formData.age,
-                weightKg: formData.weightKg,
-                trainingGoal: formData.trainingGoal,
-                shoeTracker: profile?.shoeTracker || []
-            }, { merge: true });
-            setIsEditing(false);
-        } catch (err) {
-            console.error(err);
-            alert("Failed to update profile");
-        }
+        setIsEditing(false);
     };
 
-    const getPlan = (goal) => {
+    const getPlan = (goal, sportFocus = 'RUNNING') => {
+        if (sportFocus === 'HYROX') {
+            switch (goal) {
+                case 'Short Distance':
+                    return [
+                        { day: 'MON', type: 'STRENGTH', desc: 'Heavy Sled Push/Pull + 400m Runs' },
+                        { day: 'TUE', type: 'ENDURANCE', desc: 'EMOM 40: Row/Ski/Run Rotation' },
+                        { day: 'WED', type: 'SKILLS', desc: 'Burpee Broad Jumps + Wall Balls' },
+                        { day: 'THU', type: 'STRENGTH', desc: 'Farmers Carry + Lunges + Sandbag' },
+                        { day: 'FRI', type: 'RECOVERY', desc: 'Mobility + Zone 2 Row' },
+                        { day: 'SAT', type: 'SIMULATION', desc: 'Hyrox Simulation: 4 Rounds @ 50%' },
+                        { day: 'SUN', type: 'REST', desc: 'Total Rest' },
+                    ];
+                case 'Long Distance':
+                    return [
+                        { day: 'MON', type: 'STRENGTH', desc: 'Lower Body Power + Interval Row' },
+                        { day: 'TUE', type: 'CAPACITY', desc: '90min Mixed Cardio (Run/Ski/Row)' },
+                        { day: 'WED', type: 'HYBRID', desc: 'Strength + 5km Tempo Run' },
+                        { day: 'THU', type: 'STRENGTH', desc: 'Upper Body Pull + Wall Ball Vol.' },
+                        { day: 'FRI', type: 'EASY', desc: 'Recovery Run: 8km' },
+                        { day: 'SAT', type: 'SIMULATION', desc: 'Full Hyrox Sim: 8km + 8 Stations' },
+                        { day: 'SUN', type: 'REST', desc: 'Total Rest' },
+                    ];
+                default:
+                    return [
+                        { day: 'MON', type: 'FULL BODY', desc: 'Functional Strength Circuit' },
+                        { day: 'TUE', type: 'RUN', desc: 'Intervals: 4x800m' },
+                        { day: 'WED', type: 'REST', desc: 'Rest Day' },
+                        { day: 'THU', type: 'STRENGTH', desc: 'Kettlebell Work + Sleds' },
+                        { day: 'FRI', type: 'ENDURANCE', desc: '45min Row/Ski' },
+                        { day: 'SAT', type: 'ACTIVE', desc: 'Outdoor Run or Group Class' },
+                        { day: 'SUN', type: 'REST', desc: 'Rest Day' },
+                    ];
+            }
+        }
+
         switch (goal) {
             case 'Short Distance':
                 return [
@@ -90,7 +99,7 @@ export default function PlanFeature({ user, profile }) {
                     { day: 'SAT', type: 'LONG', desc: 'Long Run: 25km+' },
                     { day: 'SUN', type: 'REST', desc: 'Total Rest' },
                 ];
-            default: // General Fitness
+            default:
                 return [
                     { day: 'MON', type: 'EASY', desc: 'Run/Walk: 30min' },
                     { day: 'TUE', type: 'REST', desc: 'Rest Day' },
@@ -103,7 +112,7 @@ export default function PlanFeature({ user, profile }) {
         }
     };
 
-    if (!localProfile?.trainingGoal || isEditing) {
+    if (!profile?.trainingGoal || isEditing) {
         return (
             <div className="p-0 space-y-8 pb-24">
                 <div className="px-4 border-b-2 border-border-bright pb-4">
@@ -126,18 +135,18 @@ export default function PlanFeature({ user, profile }) {
                     </div>
                     <div>
                         <label className="text-[10px] uppercase text-secondary block mb-1">Objective</label>
-                        <select value={formData.trainingGoal} onChange={e => setFormData({ ...formData, trainingGoal: e.target.value })} className="w-full bg-background border border-border-bright p-2 text-text outline-none font-mono uppercase focus:border-primary">
+                        <select value={formData.trainingGoal} onChange={e => setFormData({ ...formData, trainingGoal: e.target.value })} className="w-full">
                             <option value="General Fitness">General Fitness</option>
-                            <option value="Short Distance">Short Distance (5k/10k)</option>
-                            <option value="Long Distance">Long Distance (Half/Full)</option>
-                            <option value="Competitive">Competitive</option>
+                            <option value="Short Distance">Short Distance / Sprint</option>
+                            <option value="Long Distance">Long Distance / Pro</option>
+                            <option value="Competitive">Competitive Elite</option>
                         </select>
                     </div>
 
                     <button type="submit" className="w-full bg-text text-background border-2 border-text py-3 font-black uppercase hover:bg-primary hover:text-black hover:border-primary transition-colors tracking-widest">
-                        {isEditing && localProfile?.trainingGoal ? 'OVERWRITE LOGIC' : 'COMPILE PLAN'}
+                        {isEditing && profile?.trainingGoal ? 'OVERWRITE LOGIC' : 'COMPILE PLAN'}
                     </button>
-                    {isEditing && localProfile?.trainingGoal && (
+                    {isEditing && profile?.trainingGoal && (
                         <button type="button" onClick={() => setIsEditing(false)} className="w-full text-xs font-mono uppercase pt-2 text-text hover:text-primary">ABORT EDIT</button>
                     )}
                 </form>
@@ -145,7 +154,7 @@ export default function PlanFeature({ user, profile }) {
         );
     }
 
-    const plan = getPlan(localProfile.trainingGoal);
+    const plan = getPlan(profile.trainingGoal, profile.sportFocus);
 
     return (
         <div className="p-0 space-y-8 pb-24">
@@ -153,21 +162,23 @@ export default function PlanFeature({ user, profile }) {
                 <h1 className="text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5">
                     Weekly<br />Protocol
                 </h1>
-                <button onClick={() => setIsEditing(true)} className="text-xs font-bold uppercase border border-white px-2 py-1 hover:bg-white hover:text-black">
+                <button onClick={() => setIsEditing(true)} className="text-xs font-bold uppercase bg-text text-background border-2 border-text px-2 py-1 hover:bg-background hover:text-text transition-colors">
                     Edit Logic
                 </button>
             </div>
 
             <div className="border-t-2 border-border-bright">
-                <div className="flex justify-between items-center bg-black p-2 border-b-2 border-white/20">
-                    <h2 className="font-bold text-lg uppercase">{localProfile.trainingGoal.toUpperCase()}</h2>
+                <div className="flex justify-between items-center bg-background p-2 border-b-2 border-border-bright">
+                    <h2 className="font-bold text-lg uppercase">
+                        {(profile.sportFocus || 'RUNNING')} // {profile.trainingGoal.toUpperCase()}
+                    </h2>
                     <span className="text-[10px] bg-primary text-black font-bold px-2 py-0.5 uppercase">Cycle: Alpha-1</span>
                 </div>
                 <div className="grid grid-cols-1">
                     {plan.map((day, i) => {
                         return (
-                            <div key={i} className="flex group border-b border-white/20 hover:bg-text hover:text-background transition-colors min-h-[60px]">
-                                <div className="w-12 bg-white/10 group-hover:bg-background/10 flex items-center justify-center border-r border-white/20">
+                            <div key={i} className="flex group border-b border-border-bright hover:bg-text hover:text-background transition-colors min-h-[60px]">
+                                <div className="w-12 bg-white/10 group-hover:bg-background/10 flex items-center justify-center border-r border-border-bright">
                                     <div className="text-xs font-black -rotate-90">{day.day}</div>
                                 </div>
                                 <div className="flex-1 p-3 flex flex-col justify-center">

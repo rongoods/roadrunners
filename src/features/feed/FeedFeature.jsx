@@ -3,13 +3,31 @@ import { collection, query, orderBy, limit, onSnapshot, addDoc, doc, setDoc } fr
 import { db, isMock } from '../../api/firebase';
 import { MOCK_DATA } from '../../utils/constants';
 import { formatDate } from '../../utils/formatters';
+import { cn } from '../../utils/cn';
+import RunMap from './RunMap';
 
 const appId = window.__app_id || 'demo-app';
 
-export default function FeedFeature({ user, profile }) {
+export default function FeedFeature({ user, profile, onViewProfile }) {
     const [runs, setRuns] = useState([]);
     const [showLogForm, setShowLogForm] = useState(false);
-    const [newRun, setNewRun] = useState({ distance: '', duration: '', date: formatDate(new Date(), 'yyyy-MM-dd'), shoeId: '' });
+    const [newRun, setNewRun] = useState({
+        distance: '',
+        duration: '',
+        date: formatDate(new Date(), 'yyyy-MM-dd'),
+        shoeId: '',
+        route: [],
+        activityType: 'RUN' // Default to RUN
+    });
+    const [showTraceMap, setShowTraceMap] = useState(false);
+    const [activeFilter, setActiveFilter] = useState(profile?.sportFocus || 'MIXED');
+
+    useEffect(() => {
+        if (profile?.sportFocus) {
+            setActiveFilter(profile.sportFocus);
+        }
+    }, [profile?.sportFocus]);
+
 
     useEffect(() => {
         if (isMock) {
@@ -42,6 +60,8 @@ export default function FeedFeature({ user, profile }) {
             date: newRun.date,
             shoeId: newRun.shoeId || null,
             shoeName: profile?.shoeTracker?.find(s => s.id === newRun.shoeId)?.name || null,
+            route: newRun.route || [],
+            activityType: newRun.activityType,
             kudosCount: 0,
             timestamp: new Date()
         };
@@ -49,14 +69,16 @@ export default function FeedFeature({ user, profile }) {
         if (isMock) {
             setRuns(prev => [{ id: Date.now().toString(), ...runData }, ...prev]);
             setShowLogForm(false);
-            setNewRun({ distance: '', duration: '', date: formatDate(new Date(), 'yyyy-MM-dd'), shoeId: '' });
+            setShowTraceMap(false);
+            setNewRun({ distance: '', duration: '', date: formatDate(new Date(), 'yyyy-MM-dd'), shoeId: '', route: [] });
             return;
         }
 
         try {
             await addDoc(collection(db, `artifacts/${appId}/public/data/runs`), runData);
             setShowLogForm(false);
-            setNewRun({ distance: '', duration: '', date: formatDate(new Date(), 'yyyy-MM-dd'), shoeId: '' });
+            setShowTraceMap(false);
+            setNewRun({ distance: '', duration: '', date: formatDate(new Date(), 'yyyy-MM-dd'), shoeId: '', route: [], activityType: 'RUN' });
         } catch (err) {
             console.error("Error adding run: ", err);
             alert("Failed to post run. Check permissions.");
@@ -88,9 +110,27 @@ export default function FeedFeature({ user, profile }) {
                 </button>
             </div>
 
+            {/* Filter Menu */}
+            <div className="flex border-y-2 border-border-bright bg-background sticky top-8 z-30">
+                {['RUNNING', 'HYROX', 'MIXED'].map((filter) => (
+                    <button
+                        key={filter}
+                        onClick={() => setActiveFilter(filter)}
+                        className={cn(
+                            "flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-colors border-r-2 last:border-r-0 border-border-bright",
+                            activeFilter === filter
+                                ? "bg-primary text-black"
+                                : "hover:bg-white/5 text-secondary"
+                        )}
+                    >
+                        {filter}
+                    </button>
+                ))}
+            </div>
+
             {showLogForm && (
-                <form onSubmit={handleLogRun} className="mx-4 bg-black border-2 border-border-bright p-4 space-y-4">
-                    <h3 className="font-bold text-lg uppercase border-b border-white/20 pb-2">New Entry</h3>
+                <form onSubmit={handleLogRun} className="mx-4 bg-background border-2 border-border-bright p-4 space-y-4">
+                    <h3 className="font-bold text-lg uppercase border-b border-border-bright pb-2">New Entry</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="text-xs uppercase text-secondary mb-1 block">Distance (km)</label>
@@ -98,7 +138,7 @@ export default function FeedFeature({ user, profile }) {
                                 type="number" step="0.01" required
                                 value={newRun.distance}
                                 onChange={e => setNewRun({ ...newRun, distance: e.target.value })}
-                                className="w-full bg-black border-2 border-white/50 p-2 text-white focus:border-primary outline-none font-mono"
+                                className="w-full bg-background border-2 border-border-bright p-2 text-text focus:border-primary outline-none font-mono"
                             />
                         </div>
                         <div>
@@ -107,7 +147,7 @@ export default function FeedFeature({ user, profile }) {
                                 type="number" step="1" required
                                 value={newRun.duration}
                                 onChange={e => setNewRun({ ...newRun, duration: e.target.value })}
-                                className="w-full bg-black border-2 border-white/50 p-2 text-white focus:border-primary outline-none font-mono"
+                                className="w-full bg-background border-2 border-border-bright p-2 text-text focus:border-primary outline-none font-mono"
                             />
                         </div>
                     </div>
@@ -117,7 +157,7 @@ export default function FeedFeature({ user, profile }) {
                             type="date" required
                             value={newRun.date}
                             onChange={e => setNewRun({ ...newRun, date: e.target.value })}
-                            className="w-full bg-black border-2 border-white/50 p-2 text-white focus:border-primary outline-none font-mono uppercase"
+                            className="w-full bg-background border-2 border-border-bright p-2 text-text focus:border-primary outline-none font-mono uppercase"
                         />
                     </div>
                     {profile?.shoeTracker?.length > 0 && (
@@ -126,7 +166,7 @@ export default function FeedFeature({ user, profile }) {
                             <select
                                 value={newRun.shoeId}
                                 onChange={e => setNewRun({ ...newRun, shoeId: e.target.value })}
-                                className="w-full bg-black border-2 border-white/50 p-2 text-white focus:border-primary outline-none font-mono uppercase"
+                                className="w-full"
                             >
                                 <option value="">NO SHOES SELECTED</option>
                                 {/* eslint-disable-next-line react/prop-types */}
@@ -136,7 +176,51 @@ export default function FeedFeature({ user, profile }) {
                             </select>
                         </div>
                     )}
-                    <button type="submit" className="w-full bg-white text-black border-2 border-white py-3 font-black uppercase tracking-widest hover:bg-primary hover:border-primary transition-colors">
+
+                    <div>
+                        <label className="text-xs uppercase text-secondary mb-1 block">Activity Type</label>
+                        <div className="flex gap-2">
+                            {['RUN', 'HYROX'].map(type => (
+                                <button
+                                    key={type}
+                                    type="button"
+                                    onClick={() => setNewRun({ ...newRun, activityType: type })}
+                                    className={cn(
+                                        "flex-1 py-2 text-xs font-bold uppercase border-2 transition-colors",
+                                        newRun.activityType === type
+                                            ? "bg-primary text-black border-primary"
+                                            : "bg-background text-text border-border-bright hover:bg-white/5"
+                                    )}
+                                >
+                                    {type}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <button
+                            type="button"
+                            onClick={() => setShowTraceMap(!showTraceMap)}
+                            className={cn(
+                                "w-full text-xs font-bold uppercase py-2 border-2 transition-colors",
+                                showTraceMap ? "bg-primary text-black border-primary" : "bg-background text-text border-border-bright hover:bg-white/5"
+                            )}
+                        >
+                            {showTraceMap ? '[-] HIDE MAP' : '[+] TRACE ROUTE'}
+                        </button>
+
+                        {showTraceMap && (
+                            <RunMap
+                                route={newRun.route}
+                                isInteractive={true}
+                                onRouteUpdate={(route) => setNewRun({ ...newRun, route })}
+                                height="250px"
+                            />
+                        )}
+                    </div>
+
+                    <button type="submit" className="w-full bg-text text-background border-2 border-text py-3 font-black uppercase tracking-widest hover:bg-primary hover:text-black hover:border-primary transition-colors">
                         CONFIRM ENTRY
                     </button>
                 </form>
@@ -148,53 +232,85 @@ export default function FeedFeature({ user, profile }) {
                         <p className="font-mono text-sm">NO SIGNAL DETECTED.</p>
                     </div>
                 ) : (
-                    runs.map(run => (
-                        <div key={run.id} className="group border-b-2 border-border-bright p-4 hover:bg-text hover:text-background transition-colors relative">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-white text-black flex items-center justify-center font-bold">
-                                        {run.username.charAt(0).toUpperCase()}
+                    runs
+                        .filter(run => {
+                            if (activeFilter === 'MIXED') return true;
+                            if (activeFilter === 'RUNNING') return run.activityType === 'RUN';
+                            if (activeFilter === 'HYROX') return run.activityType === 'HYROX';
+                            return true;
+                        })
+                        .map(run => (
+                            <div key={run.id} className="group border-b-2 border-border-bright p-4 hover:bg-text hover:text-background transition-colors relative">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div
+                                        className="flex items-center gap-3 cursor-pointer"
+                                        onClick={() => onViewProfile(run.userId)}
+                                    >
+                                        <div className="w-8 h-8 bg-white text-black flex items-center justify-center font-bold group-hover:bg-primary group-hover:text-black">
+                                            {run.username.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold uppercase tracking-tight text-lg leading-none group-hover:underline underline-offset-4">{run.username}</p>
+                                            <p className="text-[10px] font-mono group-hover:text-background/70 opacity-70 uppercase">{formatDate(new Date(run.date), 'dd.MM.yyyy')}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-bold uppercase tracking-tight text-lg leading-none">{run.username}</p>
-                                        <p className="text-[10px] font-mono group-hover:text-black/70 opacity-70 uppercase">{formatDate(new Date(run.date), 'dd.MM.yyyy')}</p>
+                                    <div className="flex flex-col items-end gap-1">
+                                        {run.activityType && (
+                                            <span className={cn(
+                                                "text-[10px] font-bold px-2 py-0.5 uppercase",
+                                                run.activityType === 'HYROX' ? "bg-secondary text-background" : "bg-primary text-black"
+                                            )}>
+                                                {run.activityType}
+                                            </span>
+                                        )}
+                                        {run.shoeName && (
+                                            <span className="text-[10px] uppercase border border-current px-2 py-0.5 font-mono">
+                                                {run.shoeName}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
-                                {run.shoeName && (
-                                    <span className="text-[10px] uppercase border border-current px-2 py-0.5 font-mono">
-                                        {run.shoeName}
-                                    </span>
+
+                                <div className="grid grid-cols-3 gap-0 border-2 border-current mb-4">
+                                    <div className="p-2 border-r-2 border-current text-center">
+                                        <p className="text-2xl font-mono font-bold leading-none">{run.distanceKm}</p>
+                                        <p className="text-[9px] uppercase tracking-widest opacity-80">KM</p>
+                                    </div>
+                                    <div className="p-2 border-r-2 border-current text-center">
+                                        <p className="text-2xl font-mono font-bold leading-none">{run.paceMinPerKm}</p>
+                                        <p className="text-[9px] uppercase tracking-widest opacity-80">MIN/KM</p>
+                                    </div>
+                                    <div className="p-2 text-center">
+                                        <p className="text-2xl font-mono font-bold leading-none">{run.durationMinutes}</p>
+                                        <p className="text-[9px] uppercase tracking-widest opacity-80">MIN</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-center px-1">
+                                    <div className="text-[10px] font-mono opacity-50 uppercase">
+                                        ID: {run.id.substring(0, 6)}
+                                    </div>
+                                    <button
+                                        onClick={() => giveKudos(run)}
+                                        className="font-bold uppercase text-xs tracking-wider hover:underline decoration-2 underline-offset-4"
+                                    >
+                                        [ KUDOS : {run.kudosCount || 0} ]
+                                    </button>
+                                </div>
+
+                                {run.route && run.route.length > 0 && (
+                                    <div className="mt-4">
+                                        <RunMap
+                                            route={run.route}
+                                            isInteractive={false}
+                                            height="150px"
+                                            className="opacity-80 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 transition-all cursor-crosshair"
+                                        />
+                                        <p className="text-[8px] font-mono uppercase opacity-50 mt-1">Satellite Visualization: Trail Vector Protocol</p>
+                                    </div>
                                 )}
                             </div>
-
-                            <div className="grid grid-cols-3 gap-0 border-2 border-current mb-4">
-                                <div className="p-2 border-r-2 border-current text-center">
-                                    <p className="text-2xl font-mono font-bold leading-none">{run.distanceKm}</p>
-                                    <p className="text-[9px] uppercase tracking-widest opacity-80">KM</p>
-                                </div>
-                                <div className="p-2 border-r-2 border-current text-center">
-                                    <p className="text-2xl font-mono font-bold leading-none">{run.paceMinPerKm}</p>
-                                    <p className="text-[9px] uppercase tracking-widest opacity-80">MIN/KM</p>
-                                </div>
-                                <div className="p-2 text-center">
-                                    <p className="text-2xl font-mono font-bold leading-none">{run.durationMinutes}</p>
-                                    <p className="text-[9px] uppercase tracking-widest opacity-80">MIN</p>
-                                </div>
-                            </div>
-
-                            <div className="flex justify-between items-center px-1">
-                                <div className="text-[10px] font-mono opacity-50 uppercase">
-                                    ID: {run.id.substring(0, 6)}
-                                </div>
-                                <button
-                                    onClick={() => giveKudos(run)}
-                                    className="font-bold uppercase text-xs tracking-wider hover:underline decoration-2 underline-offset-4"
-                                >
-                                    [ KUDOS : {run.kudosCount || 0} ]
-                                </button>
-                            </div>
-                        </div>
-                    ))
+                        ))
                 )}
             </div>
         </div>
