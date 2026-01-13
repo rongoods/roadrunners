@@ -374,30 +374,31 @@ export default function GroupsFeature({ user, profile }) {
 
     return (
         <div className="p-0 pb-24">
-            <div className="flex justify-between items-end px-4 border-b-2 border-border-bright pb-4">
-                <div className="flex flex-col">
-                    <div className="flex gap-2 mb-2">
-                        <button
-                            onClick={() => setSubTab('GROUPS')}
-                            className={cn("text-[10px] font-black uppercase px-2 py-0.5 border transition-colors", subTab === 'GROUPS' ? "bg-primary text-black border-primary" : "bg-background text-text border-border-bright hover:bg-white/5")}
-                        >
-                            GROUPS
-                        </button>
-                        <button
-                            onClick={() => setSubTab('CHALLENGES')}
-                            className={cn("text-[10px] font-black uppercase px-2 py-0.5 border transition-colors", subTab === 'CHALLENGES' ? "bg-primary text-black border-primary" : "bg-background text-text border-border-bright hover:bg-white/5")}
-                        >
-                            CHALLENGES
-                        </button>
-                    </div>
-                    <h1 className="text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5">
-                        {subTab === 'GROUPS' ? 'Groups' : 'Challenges'}<br />Index
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end px-4 border-b-2 border-border-bright pb-4 pt-4 gap-4 sm:gap-0">
+                <div className="flex gap-4 sm:gap-8">
+                    <h1
+                        onClick={() => setSubTab('GROUPS')}
+                        className={cn(
+                            "text-2xl sm:text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5 cursor-pointer transition-all",
+                            subTab === 'GROUPS' ? "text-primary opacity-100" : "text-text opacity-30 hover:opacity-100"
+                        )}
+                    >
+                        Groups<br />Index
+                    </h1>
+                    <h1
+                        onClick={() => setSubTab('CHALLENGES')}
+                        className={cn(
+                            "text-2xl sm:text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5 cursor-pointer transition-all",
+                            subTab === 'CHALLENGES' ? "text-primary opacity-100" : "text-text opacity-30 hover:opacity-100"
+                        )}
+                    >
+                        Challenges<br />Index
                     </h1>
                 </div>
                 {subTab === 'GROUPS' && (
                     <button
                         onClick={() => setShowCreateGroup(!showCreateGroup)}
-                        className="bg-text text-background text-sm font-bold px-4 py-2 uppercase border-2 border-text hover:bg-background hover:text-text transition-colors"
+                        className="w-full sm:w-auto bg-text text-background text-xs sm:text-sm font-bold px-3 py-2 sm:px-4 sm:py-2 uppercase border-2 border-text hover:bg-background hover:text-text transition-colors"
                     >
                         {showCreateGroup ? 'ABORT' : 'CREATE +'}
                     </button>
@@ -478,12 +479,23 @@ export default function GroupsFeature({ user, profile }) {
                                 </div>
                                 <div>
                                     <label className="text-[10px] uppercase text-secondary block mb-1">Typical Pace</label>
-                                    <input
+                                    <select
                                         value={newGroupData.pace}
                                         onChange={e => setNewGroupData({ ...newGroupData, pace: e.target.value })}
-                                        className="w-full bg-background border border-border-bright p-2 text-xs text-text font-mono uppercase"
-                                        placeholder="MIN/KM"
-                                    />
+                                        className="w-full"
+                                    >
+                                        <option value="">SELECT PACE</option>
+                                        {(() => {
+                                            const options = [];
+                                            for (let min = 3; min <= 12; min++) {
+                                                for (let sec = 0; sec < 60; sec += 15) {
+                                                    const paceStr = `${min}:${sec === 0 ? '00' : sec}`;
+                                                    options.push(<option key={paceStr} value={paceStr}>{paceStr} MIN/KM</option>);
+                                                }
+                                            }
+                                            return options;
+                                        })()}
+                                    </select>
                                 </div>
                                 <div className="col-span-2">
                                     <label className="text-[10px] uppercase text-secondary block mb-1">Sport Type</label>

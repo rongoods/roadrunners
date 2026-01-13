@@ -242,8 +242,30 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                     <form onSubmit={handleAddShoe} className="border-2 border-border-bright p-4 space-y-3 bg-background">
                         <input value={newShoe.name} onChange={e => setNewShoe({ ...newShoe, name: e.target.value })} placeholder="MODEL DESIGNATION" required className="w-full bg-background border border-border-bright p-2 text-text outline-none font-mono uppercase text-xs" />
                         <div className="flex gap-2">
-                            <input type="number" value={newShoe.startDist} onChange={e => setNewShoe({ ...newShoe, startDist: e.target.value })} placeholder="INIT" className="flex-1 bg-background border border-border-bright p-2 text-text outline-none font-mono uppercase text-xs" />
-                            <input type="number" value={newShoe.targetDist} onChange={e => setNewShoe({ ...newShoe, targetDist: e.target.value })} placeholder="MAX" className="flex-1 bg-background border border-border-bright p-2 text-text outline-none font-mono uppercase text-xs" />
+                            <div className="flex-1">
+                                <label className="text-[10px] uppercase text-secondary block mb-1">Init KM</label>
+                                <select
+                                    value={newShoe.startDist}
+                                    onChange={e => setNewShoe({ ...newShoe, startDist: e.target.value })}
+                                    className="w-full"
+                                >
+                                    {Array.from({ length: 25 }, (_, i) => i * 50).map(val => (
+                                        <option key={val} value={val}>{val} KM</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex-1">
+                                <label className="text-[10px] uppercase text-secondary block mb-1">Max KM</label>
+                                <select
+                                    value={newShoe.targetDist}
+                                    onChange={e => setNewShoe({ ...newShoe, targetDist: e.target.value })}
+                                    className="w-full"
+                                >
+                                    {Array.from({ length: 25 }, (_, i) => i * 50).map(val => (
+                                        <option key={val} value={val}>{val} KM</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                         <button type="submit" className="w-full bg-text text-background font-bold uppercase text-xs py-2 hover:bg-primary hover:text-black transition-colors">CONFIRM REGISTRATION</button>
                     </form>

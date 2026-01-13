@@ -162,25 +162,31 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                             <label className="text-[10px] font-bold uppercase text-secondary mb-1 block">
                                 {(newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX') ? 'Run / Interval (KM)' : 'Distance (KM)'}
                             </label>
-                            <input
-                                type="number" step="0.01"
+                            <select
                                 value={newRun.distance}
                                 onChange={e => setNewRun({ ...newRun, distance: e.target.value })}
-                                className="w-full bg-background border-2 border-border-bright p-2 text-text focus:border-primary outline-none font-mono"
-                                placeholder="OPTIONAL"
-                            />
+                                className="w-full"
+                            >
+                                <option value="">SELECT KM</option>
+                                {Array.from({ length: 100 }, (_, i) => (i + 1) * 0.5).map(val => (
+                                    <option key={val} value={val}>{val.toFixed(1)} KM</option>
+                                ))}
+                            </select>
                         </div>
                         <div>
                             <label className="text-[10px] font-bold uppercase text-secondary mb-1 block">
                                 {(newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX') ? 'Total Time (MIN)' : 'Duration (MIN)'}
                             </label>
-                            <input
-                                type="number" step="1"
+                            <select
                                 value={newRun.duration}
                                 onChange={e => setNewRun({ ...newRun, duration: e.target.value })}
-                                className="w-full bg-background border-2 border-border-bright p-2 text-text focus:border-primary outline-none font-mono"
-                                placeholder="OPTIONAL"
-                            />
+                                className="w-full"
+                            >
+                                <option value="">SELECT MIN</option>
+                                {Array.from({ length: 60 }, (_, i) => (i + 1) * 5).map(val => (
+                                    <option key={val} value={val}>{val} MIN</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <div>
