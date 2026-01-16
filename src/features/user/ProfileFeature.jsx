@@ -3,6 +3,8 @@ import { collection, query, where, onSnapshot, doc, setDoc } from 'firebase/fire
 import { db, isMock } from '../../api/firebase';
 import { MOCK_DATA } from '../../utils/constants';
 import { cn } from '../../utils/cn';
+import { subDays, subWeeks, subMonths, isAfter } from 'date-fns';
+import { formatDate } from '../../utils/formatters';
 
 const appId = window.__app_id || 'demo-app';
 
@@ -12,6 +14,7 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
     const [loading, setLoading] = useState(true);
     const [showAddShoe, setShowAddShoe] = useState(false);
     const [newShoe, setNewShoe] = useState({ name: '', startDist: 0, targetDist: 800 });
+    const [historyFilter, setHistoryFilter] = useState('ALL'); // 'DAILY', 'WEEKLY', 'MONTHLY', 'ALL'
 
     const isOwnProfile = !viewedUserId || (user && viewedUserId === user.uid);
     const effectiveUserId = viewedUserId || user?.uid;
@@ -86,6 +89,19 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
             return { ...shoe, currentMileage: total, percent };
         });
     }, [displayedProfile, displayedRuns]);
+
+    const filteredHistory = useMemo(() => {
+        const now = new Date();
+        return displayedRuns
+            .filter(run => {
+                const runDate = new Date(run.date);
+                if (historyFilter === 'DAILY') return isAfter(runDate, subDays(now, 1));
+                if (historyFilter === 'WEEKLY') return isAfter(runDate, subWeeks(now, 1));
+                if (historyFilter === 'MONTHLY') return isAfter(runDate, subMonths(now, 1));
+                return true;
+            })
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+    }, [displayedRuns, historyFilter]);
 
     const handleAddShoe = async (e) => {
         e.preventDefault();
@@ -292,6 +308,54 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                                 </div>
                                 <div className="text-right mt-1">
                                     <span className="text-[9px] font-mono uppercase text-secondary">{shoe.percent.toFixed(0)}% LIFESPAN</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Workout History */}
+            <div className="space-y-4 px-4 pb-12">
+                <div className="flex justify-between items-center border-b border-border-bright pb-2">
+                    <h2 className="text-xl font-bold uppercase tracking-tight">Workout History</h2>
+                    <div className="flex gap-1">
+                        {['DAILY', 'WEEKLY', 'MONTHLY', 'ALL'].map(f => (
+                            <button
+                                key={f}
+                                onClick={() => setHistoryFilter(f)}
+                                className={cn(
+                                    "text-[9px] font-bold px-2 py-1 border transition-colors",
+                                    historyFilter === f ? "bg-primary text-black border-primary" : "border-border-bright text-secondary hover:bg-white/5"
+                                )}
+                            >
+                                {f}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {filteredHistory.length === 0 ? (
+                    <div className="text-center p-8 text-secondary text-xs uppercase border border-dashed border-border-bright font-mono">
+                        NO ACTIVITY LOGGED FOR THIS PERIOD.
+                    </div>
+                ) : (
+                    <div className="space-y-0 border-x border-t border-border-bright">
+                        {filteredHistory.map(run => (
+                            <div key={run.id || run.timestamp} className="border-b border-border-bright p-3 grid grid-cols-4 gap-2 items-center hover:bg-white/5 transition-colors">
+                                <div className="col-span-1">
+                                    <p className="text-[10px] font-mono opacity-60 leading-none">{formatDate(run.date, 'dd.MM.yy')}</p>
+                                    <p className="text-[8px] font-black text-primary uppercase mt-1 tracking-widest">{run.activityType || 'RUN'}</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-sm font-bold font-mono">{run.distanceKm}KM</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-sm font-bold font-mono">{run.paceMinPerKm}</p>
+                                    <p className="text-[7px] uppercase opacity-50">MIN/KM</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-sm font-bold font-mono">{run.durationMinutes}M</p>
                                 </div>
                             </div>
                         ))}

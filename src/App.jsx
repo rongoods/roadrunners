@@ -51,7 +51,7 @@ export default function App() {
       <main className="relative min-h-screen w-full max-w-7xl mx-auto border-x-2 border-border-bright bg-background z-10 pt-12 pb-20">
         {/* Header Status Bar - Fluid with main */}
         <div className="fixed top-0 left-0 right-0 max-w-7xl mx-auto bg-background border-b-2 border-border-bright p-1 flex justify-between items-center z-40 px-2 h-8">
-          <span className="text-[10px] uppercase font-mono text-primary animate-pulse">NEVER STOP</span>
+          <span className="text-[10px] uppercase font-mono text-primary animate-pulse">CLICHÉ</span>
           <div className="flex items-center gap-2">
             <span className="text-[10px] uppercase font-mono text-text">{format(currentTime, 'HH:mm:ss')} // </span>
             <button

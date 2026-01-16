@@ -5,7 +5,7 @@ export const TABS = {
     PROFILE: 'profile'
 };
 
-export const MOCK_USER = { uid: 'mock-user-123', email: 'guest@roadrunners.app', displayName: 'Guest Runner' };
+export const MOCK_USER = { uid: 'mock-user-123', email: 'guest@cliche.app', displayName: 'Guest Runner' };
 
 export const MOCK_DATA = {
     runs: [
