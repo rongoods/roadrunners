@@ -4,6 +4,7 @@ import { db, isMock } from '../../api/firebase';
 import { MOCK_DATA } from '../../utils/constants';
 import { formatDate } from '../../utils/formatters';
 import { cn } from '../../utils/cn';
+import { useLoading } from '../../context/LoadingContext';
 import RunMap from './RunMap';
 
 const appId = window.__app_id || 'demo-app';
@@ -22,6 +23,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
     });
     const [showTraceMap, setShowTraceMap] = useState(false);
     const [activeFilter, setActiveFilter] = useState(profile?.sportFocus || 'MIXED');
+    const { startLoading, stopLoading } = useLoading();
 
     useEffect(() => {
         if (profile?.sportFocus) {
@@ -36,9 +38,17 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
             return;
         }
         if (!db) return;
+
+        // Initial fetch loader
+        startLoading();
+
         const q = query(collection(db, `artifacts/${appId}/public/data/runs`), orderBy('date', 'desc'), limit(50));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             setRuns(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+            stopLoading();
+        }, (err) => {
+            console.error(err);
+            stopLoading();
         });
         return () => unsubscribe();
     }, []);

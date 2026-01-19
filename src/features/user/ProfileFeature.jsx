@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { collection, query, where, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { db, isMock } from '../../api/firebase';
+import { useLoading } from '../../context/LoadingContext';
 import { MOCK_DATA } from '../../utils/constants';
 import { cn } from '../../utils/cn';
 import { subDays, subWeeks, subMonths, isAfter } from 'date-fns';
@@ -15,6 +16,7 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
     const [showAddShoe, setShowAddShoe] = useState(false);
     const [newShoe, setNewShoe] = useState({ name: '', startDist: 0, targetDist: 800 });
     const [historyFilter, setHistoryFilter] = useState('ALL'); // 'DAILY', 'WEEKLY', 'MONTHLY', 'ALL'
+    const { startLoading, stopLoading } = useLoading();
 
     const isOwnProfile = !viewedUserId || (user && viewedUserId === user.uid);
     const effectiveUserId = viewedUserId || user?.uid;
@@ -46,6 +48,8 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
         }
 
         const profileRef = doc(db, `artifacts/${appId}/users/${effectiveUserId}/profiles/${effectiveUserId}`);
+
+        startLoading();
         const unsubscribe = onSnapshot(profileRef, (docSnap) => {
             if (docSnap.exists()) {
                 setDisplayedProfile(docSnap.data());
@@ -53,6 +57,11 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                 setDisplayedProfile(null);
             }
             setLoading(false);
+            stopLoading();
+        }, (err) => {
+            console.error(err);
+            setLoading(false);
+            stopLoading();
         });
         return () => unsubscribe();
     }, [effectiveUserId, profile, isOwnProfile, viewedUserId]);
