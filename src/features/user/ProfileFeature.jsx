@@ -211,8 +211,8 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                 </div>
             </div>
 
-            {/* Music Section */}
-            <div className="mx-4 border-2 border-border-bright p-4 flex flex-col gap-2 relative bg-background">
+            {/* Music Section - HIDDEN */}
+            {/* <div className="mx-4 border-2 border-border-bright p-4 flex flex-col gap-2 relative bg-background">
                 <div className="absolute top-0 right-0 bg-text text-background text-[10px] font-bold px-1 uppercase">Audio Protocol</div>
                 <h3 className="text-xs font-bold text-secondary uppercase tracking-wider">Current Anthem</h3>
                 <div className="flex items-center gap-2">
@@ -240,7 +240,7 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                         [ UPDATE AUDIO LINK ]
                     </button>
                 )}
-            </div>
+            </div> */}
 
             <div className="grid grid-cols-2 gap-0 border-y-2 border-border-bright mx-4">
                 <div className="p-4 border-r-2 border-border-bright text-center hover:bg-text hover:text-background transition-colors">
