@@ -9,7 +9,7 @@ import { formatDate } from '../../utils/formatters';
 
 const appId = window.__app_id || 'demo-app';
 
-export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin, onLogout, viewedUserId, onBack }) {
+export default function ProfileFeature({ user, profile, onUpdateProfile, onLoginGoogle, onLoginApple, onLogout, viewedUserId, onBack }) {
     const [displayedRuns, setDisplayedRuns] = useState([]);
     const [displayedProfile, setDisplayedProfile] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -203,9 +203,14 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                                 Logout
                             </button>
                         ) : (
-                            <button onClick={onLogin} className="text-[10px] text-primary hover:bg-primary hover:text-black border border-primary px-2 py-0.5 uppercase font-bold transition-colors">
-                                Login w/ Google
-                            </button>
+                            <div className="flex flex-col gap-1">
+                                <button onClick={onLoginGoogle} className="text-[10px] text-primary hover:bg-primary hover:text-black border border-primary px-2 py-0.5 uppercase font-bold transition-colors">
+                                    Login w/ Google
+                                </button>
+                                <button onClick={onLoginApple} className="text-[10px] text-primary hover:bg-primary hover:text-black border border-primary px-2 py-0.5 uppercase font-bold transition-colors">
+                                    Login w/ Apple
+                                </button>
+                            </div>
                         )
                     )}
                 </div>

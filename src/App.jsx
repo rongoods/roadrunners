@@ -11,6 +11,9 @@ import { useAuth } from './hooks/useAuth';
 import { useProfile } from './hooks/useProfile';
 import { useTheme } from './hooks/useTheme';
 import { LoadingProvider } from './context/LoadingContext'; // New Import
+import LightLogo from './assets/logo_light.jpg';
+import DarkLogo from './assets/logo_dark.jpg';
+import ClicheTitle from './assets/title_cliche.jpg';
 import { TABS } from './utils/constants';
 
 // Styles
@@ -20,7 +23,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(TABS.FEED);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [viewedUserId, setViewedUserId] = useState(null);
-  const { user, signInWithGoogle, logout } = useAuth();
+  const { user, signInWithGoogle, signInWithApple, logout } = useAuth();
   const { profile, updateProfile } = useProfile(user);
   const { theme, toggleTheme } = useTheme(); // Hook usage
 
@@ -63,6 +66,16 @@ export default function App() {
                 [{theme === 'dark' ? 'LIGHT' : 'DARK'}]
               </button>
             </div>
+
+            {/* Centered Logo (Light & Dark) */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+              {theme === 'light' && (
+                <img src={LightLogo} alt="Logo" className="h-6 object-contain mix-blend-multiply" />
+              )}
+              {theme === 'dark' && (
+                <img src={DarkLogo} alt="Logo" className="h-6 object-contain mix-blend-screen" />
+              )}
+            </div>
           </div>
 
           <div className="mt-0 px-0">
@@ -75,7 +88,8 @@ export default function App() {
                 user={user}
                 profile={profile}
                 onUpdateProfile={updateProfile}
-                onLogin={signInWithGoogle}
+                onLoginGoogle={signInWithGoogle}
+                onLoginApple={signInWithApple}
                 onLogout={logout}
                 viewedUserId={viewedUserId}
                 onBack={() => setViewedUserId(null)}

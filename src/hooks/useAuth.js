@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, OAuthProvider, signOut } from 'firebase/auth';
 import { auth, isMock } from '../api/firebase';
 import { MOCK_USER } from '../utils/constants';
 
@@ -9,7 +9,11 @@ export function useAuth() {
 
     useEffect(() => {
         if (isMock) {
-            setUser(MOCK_USER);
+            // Check if there's a stored mock session
+            const storedMockUser = localStorage.getItem('mock_user');
+            if (storedMockUser) {
+                setUser(JSON.parse(storedMockUser));
+            }
             setLoading(false);
             return;
         }
@@ -29,7 +33,8 @@ export function useAuth() {
 
     const signInWithGoogle = async () => {
         if (isMock) {
-            alert("This feature is only available with a valid Firebase config.");
+            setUser(MOCK_USER);
+            localStorage.setItem('mock_user', JSON.stringify(MOCK_USER));
             return;
         }
         if (!auth) return;
@@ -41,9 +46,26 @@ export function useAuth() {
         }
     };
 
+    const signInWithApple = async () => {
+        if (isMock) {
+            const appleMockUser = { ...MOCK_USER, displayName: 'Apple User', email: 'apple@example.com' };
+            setUser(appleMockUser);
+            localStorage.setItem('mock_user', JSON.stringify(appleMockUser));
+            return;
+        }
+        if (!auth) return;
+        try {
+            const provider = new OAuthProvider('apple.com');
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            console.error("Apple login failed", error);
+        }
+    };
+
     const logout = async () => {
         if (isMock) {
-            alert("Mock logout not implemented.");
+            setUser(null);
+            localStorage.removeItem('mock_user');
             return;
         }
         if (!auth) return;
@@ -54,5 +76,5 @@ export function useAuth() {
         }
     };
 
-    return { user, loading, signInWithGoogle, logout };
+    return { user, loading, signInWithGoogle, signInWithApple, logout };
 }
