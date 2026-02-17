@@ -7,6 +7,7 @@ import { MOCK_DATA } from '../../utils/constants';
 import { cn } from '../../utils/cn';
 import { subDays, subWeeks, subMonths, isAfter } from 'date-fns';
 import { formatDate } from '../../utils/formatters';
+import { getDefaultLogo } from '../../utils/defaultLogos';
 
 const appId = window.__app_id || 'demo-app';
 
@@ -221,9 +222,7 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                         {displayedProfile?.photoURL ? (
                             <img src={displayedProfile.photoURL} alt="Profile" className="w-full h-full object-cover" />
                         ) : (
-                            <div className="text-secondary text-[10px] uppercase font-mono text-center p-2 opacity-50">
-                                NO IMMG DATA
-                            </div>
+                            <img src={getDefaultLogo(effectiveUserId)} alt="Profile" className="w-full h-full object-cover opacity-80" />
                         )}
                         {isOwnProfile && (
                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
