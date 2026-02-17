@@ -1,12 +1,14 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth, signInWithCustomToken } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = window.__firebase_config || {};
 const initialAuthToken = window.__initial_auth_token;
 
 let db = null;
 let auth = null;
+let storage = null;
 let isMock = false;
 let app = null;
 
@@ -15,6 +17,7 @@ try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
+        storage = getStorage(app);
 
         if (initialAuthToken) {
             signInWithCustomToken(auth, initialAuthToken).catch(console.error);
@@ -28,4 +31,4 @@ try {
     isMock = true;
 }
 
-export { db, auth, isMock, app };
+export { db, auth, storage, isMock, app };

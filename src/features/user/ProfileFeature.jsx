@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { collection, query, where, onSnapshot, doc, setDoc } from 'firebase/firestore';
-import { db, isMock } from '../../api/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { db, storage, isMock } from '../../api/firebase';
 import { useLoading } from '../../context/LoadingContext';
 import { MOCK_DATA } from '../../utils/constants';
 import { cn } from '../../utils/cn';
@@ -17,6 +18,7 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
     const [newShoe, setNewShoe] = useState({ name: '', startDist: 0, targetDist: 800 });
     const [historyFilter, setHistoryFilter] = useState('ALL'); // 'DAILY', 'WEEKLY', 'MONTHLY', 'ALL'
     const { startLoading, stopLoading } = useLoading();
+    const fileInputRef = useRef(null);
 
     const isOwnProfile = !viewedUserId || (user && viewedUserId === user.uid);
     const effectiveUserId = viewedUserId || user?.uid;
@@ -40,7 +42,8 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                     username: MOCK_DATA.runs.find(r => r.userId === viewedUserId)?.username || 'Other Runner',
                     trainingGoal: 'Competitive',
                     musicAnthem: 'POWER - KANYE WEST',
-                    shoeTracker: []
+                    shoeTracker: [],
+                    photoURL: null
                 });
             }
             setLoading(false);
@@ -65,6 +68,48 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
         });
         return () => unsubscribe();
     }, [effectiveUserId, profile, isOwnProfile, viewedUserId]);
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file || !user) return;
+
+        if (isMock) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result;
+                onUpdateProfile({ photoURL: base64String });
+                setDisplayedProfile(prev => ({ ...prev, photoURL: base64String }));
+            };
+            reader.readAsDataURL(file);
+            return;
+        }
+
+        if (!storage) return;
+
+        try {
+            startLoading();
+            const storageRef = ref(storage, `artifacts/${appId}/users/${user.uid}/profile_pic`);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            uploadTask.on('state_changed',
+                null,
+                (error) => {
+                    console.error("Upload failed:", error);
+                    stopLoading();
+                    alert("Upload failed. Storage might not be configured.");
+                },
+                async () => {
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    await onUpdateProfile({ photoURL: downloadURL });
+                    setDisplayedProfile(prev => ({ ...prev, photoURL: downloadURL }));
+                    stopLoading();
+                }
+            );
+        } catch (err) {
+            console.error(err);
+            stopLoading();
+        }
+    };
 
     // Fetch Runs
     useEffect(() => {
@@ -164,10 +209,43 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
 
             {/* Header */}
             <div className="flex items-end justify-between px-4 border-b-2 border-border-bright pb-4">
-                <div className="flex-1">
-                    <h1 className="text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5">
-                        {isOwnProfile ? 'Runner' : 'Public'}<br />Manifest
-                    </h1>
+                <div className="flex-1 flex gap-4 items-end">
+                    {/* Profile Picture */}
+                    <div
+                        className={cn(
+                            "relative group w-20 h-20 border-2 border-border-bright bg-white/5 flex items-center justify-center transition-colors hover:border-sidebar",
+                            isOwnProfile && "cursor-pointer"
+                        )}
+                        onClick={() => isOwnProfile && fileInputRef.current?.click()}
+                    >
+                        {displayedProfile?.photoURL ? (
+                            <img src={displayedProfile.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                            <div className="text-secondary text-[10px] uppercase font-mono text-center p-2 opacity-50">
+                                NO IMMG DATA
+                            </div>
+                        )}
+                        {isOwnProfile && (
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <span className="text-[10px] text-white font-bold uppercase tracking-widest">UPLOAD</span>
+                            </div>
+                        )}
+                        {isOwnProfile && (
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                            />
+                        )}
+                    </div>
+
+                    <div>
+                        <h1 className="text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5">
+                            {isOwnProfile ? 'Runner' : 'Public'}<br />Manifest
+                        </h1>
+                    </div>
                 </div>
                 <div className="text-right flex flex-col items-end gap-2">
                     <div>
