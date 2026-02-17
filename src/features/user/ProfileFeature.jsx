@@ -23,6 +23,7 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
 
     const isOwnProfile = !viewedUserId || (user && viewedUserId === user.uid);
     const effectiveUserId = viewedUserId || user?.uid;
+    const username = displayedProfile?.username || (isOwnProfile ? (user?.email?.split('@')[0] || 'GUEST') : 'UNKNOWN');
 
     // Fetch Profile
     useEffect(() => {
@@ -242,7 +243,7 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
 
                     <div>
                         <h1 className="text-4xl font-black uppercase tracking-tighter leading-none transform -translate-x-0.5">
-                            {isOwnProfile ? 'Runner' : 'Public'}<br />Manifest
+                            {username}
                         </h1>
                     </div>
                 </div>
@@ -250,7 +251,7 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                     <div>
                         <div className="text-[10px] uppercase font-mono text-secondary mb-1">DESIGNATION</div>
                         <div className="text-sm font-bold uppercase border border-white px-2 py-1 bg-white text-black">
-                            {displayedProfile?.username || (isOwnProfile ? (user?.email?.split('@')[0] || 'GUEST') : 'UNKNOWN')}
+                            {username}
                         </div>
                     </div>
 
