@@ -40,6 +40,9 @@ export function useAuth() {
         if (!auth) return;
         try {
             const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({
+                prompt: 'select_account'
+            });
             await signInWithPopup(auth, provider);
         } catch (error) {
             console.error("Login failed", error);
