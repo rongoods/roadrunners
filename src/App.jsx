@@ -63,21 +63,8 @@ export default function App() {
                 onClick={toggleTheme}
                 className="text-[10px] uppercase font-bold px-1 border border-primary text-primary hover:bg-primary hover:text-black transition-colors"
               >
-                [{theme === 'dark' ? 'LIGHT' : theme === 'light' ? 'BLUEPRINT' : 'DARK'}]
+                [{theme.toUpperCase()}]
               </button>
-            </div>
-
-            {/* Centered Logo (Light, Dark, Blueprint) */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-              {theme === 'light' && (
-                <img src={LightLogo} alt="Logo" className="h-6 object-contain mix-blend-multiply" />
-              )}
-              {theme === 'dark' && (
-                <img src={DarkLogo} alt="Logo" className="h-6 object-contain mix-blend-screen" />
-              )}
-              {theme === 'blueprint' && (
-                <img src={DarkLogo} alt="Logo" className="h-6 object-contain mix-blend-screen opacity-90" />
-              )}
             </div>
           </div>
 
