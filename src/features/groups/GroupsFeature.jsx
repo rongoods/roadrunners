@@ -175,8 +175,7 @@ export default function GroupsFeature({ user, profile }) {
         }
 
         if (profile?.sportFocus && profile.sportFocus !== 'MIXED') {
-            if (profile.sportFocus === 'RUNNING' && g.sportType === 'HYROX') return false;
-            if (profile.sportFocus === 'HYROX' && g.sportType === 'RUNNING') return false;
+            // Future specific sportType to profile sportFocus logic
         }
 
         return true;
@@ -500,7 +499,7 @@ export default function GroupsFeature({ user, profile }) {
                                 <div className="col-span-2">
                                     <label className="text-[10px] uppercase text-secondary block mb-1">Sport Type</label>
                                     <div className="flex flex-wrap gap-2">
-                                        {['RUNNING', 'HYROX', 'WORKOUT'].map(type => (
+                                        {['RUNNING', 'WORKOUT'].map(type => (
                                             <button
                                                 key={type}
                                                 type="button"
@@ -567,7 +566,6 @@ export default function GroupsFeature({ user, profile }) {
                                                 {group.sportType && (
                                                     <span className={cn(
                                                         "text-[8px] font-bold px-1 uppercase",
-                                                        group.sportType === 'HYROX' ? "bg-secondary text-background" :
                                                             group.sportType === 'WORKOUT' ? "bg-text text-background" : "bg-primary text-black"
                                                     )}>
                                                         {group.sportType} {group.workoutCategory && `// ${group.workoutCategory}`}

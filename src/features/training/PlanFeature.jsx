@@ -68,40 +68,6 @@ export default function PlanFeature({ user, profile, onUpdateProfile }) {
             }
         }
 
-        if (sportFocus === 'HYROX') {
-            switch (goal) {
-                case 'Short Distance':
-                    return [
-                        { day: 'MON', type: 'STRENGTH', desc: 'Heavy Sled Push/Pull + 400m Runs' },
-                        { day: 'TUE', type: 'ENDURANCE', desc: 'EMOM 40: Row/Ski/Run Rotation' },
-                        { day: 'WED', type: 'SKILLS', desc: 'Burpee Broad Jumps + Wall Balls' },
-                        { day: 'THU', type: 'STRENGTH', desc: 'Farmers Carry + Lunges + Sandbag' },
-                        { day: 'FRI', type: 'RECOVERY', desc: 'Mobility + Zone 2 Row' },
-                        { day: 'SAT', type: 'SIMULATION', desc: 'Hyrox Simulation: 4 Rounds @ 50%' },
-                        { day: 'SUN', type: 'REST', desc: 'Total Rest' },
-                    ];
-                case 'Long Distance':
-                    return [
-                        { day: 'MON', type: 'STRENGTH', desc: 'Lower Body Power + Interval Row' },
-                        { day: 'TUE', type: 'CAPACITY', desc: '90min Mixed Cardio (Run/Ski/Row)' },
-                        { day: 'WED', type: 'HYBRID', desc: 'Strength + 5km Tempo Run' },
-                        { day: 'THU', type: 'STRENGTH', desc: 'Upper Body Pull + Wall Ball Vol.' },
-                        { day: 'FRI', type: 'EASY', desc: 'Recovery Run: 8km' },
-                        { day: 'SAT', type: 'SIMULATION', desc: 'Full Hyrox Sim: 8km + 8 Stations' },
-                        { day: 'SUN', type: 'REST', desc: 'Total Rest' },
-                    ];
-                default:
-                    return [
-                        { day: 'MON', type: 'FULL BODY', desc: 'Functional Strength Circuit' },
-                        { day: 'TUE', type: 'RUN', desc: 'Intervals: 4x800m' },
-                        { day: 'WED', type: 'REST', desc: 'Rest Day' },
-                        { day: 'THU', type: 'STRENGTH', desc: 'Kettlebell Work + Sleds' },
-                        { day: 'FRI', type: 'ENDURANCE', desc: '45min Row/Ski' },
-                        { day: 'SAT', type: 'ACTIVE', desc: 'Outdoor Run or Group Class' },
-                        { day: 'SUN', type: 'REST', desc: 'Rest Day' },
-                    ];
-            }
-        }
 
         switch (goal) {
             case 'Short Distance':
@@ -162,11 +128,31 @@ export default function PlanFeature({ user, profile, onUpdateProfile }) {
 
                     <div>
                         <label className="text-[10px] uppercase text-secondary block mb-1">Age</label>
-                        <input value={formData.age} onChange={e => setFormData({ ...formData, age: e.target.value })} type="number" required className="w-full bg-background border border-border-bright p-2 text-text outline-none font-mono uppercase focus:border-primary" />
+                        <select 
+                            value={formData.age} 
+                            onChange={e => setFormData({ ...formData, age: e.target.value })} 
+                            required 
+                            className="w-full bg-background border border-border-bright p-2 text-text outline-none font-mono uppercase focus:border-primary"
+                        >
+                            <option value="">SELECT AGE</option>
+                            {Array.from({ length: 85 }, (_, i) => i + 16).map(age => (
+                                <option key={age} value={age}>{age}</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label className="text-[10px] uppercase text-secondary block mb-1">Weight (kg)</label>
-                        <input value={formData.weightKg} onChange={e => setFormData({ ...formData, weightKg: e.target.value })} type="number" required className="w-full bg-background border border-border-bright p-2 text-text outline-none font-mono uppercase focus:border-primary" />
+                        <select 
+                            value={formData.weightKg} 
+                            onChange={e => setFormData({ ...formData, weightKg: e.target.value })} 
+                            required 
+                            className="w-full bg-background border border-border-bright p-2 text-text outline-none font-mono uppercase focus:border-primary"
+                        >
+                            <option value="">SELECT WEIGHT (KG)</option>
+                            {Array.from({ length: 111 }, (_, i) => i + 40).map(weight => (
+                                <option key={weight} value={weight}>{weight} KG</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label className="text-[10px] uppercase text-secondary block mb-1">Objective</label>

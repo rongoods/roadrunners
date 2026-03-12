@@ -264,7 +264,6 @@ export default function ProfileFeature({ user, profile, onUpdateProfile, onLogin
                                 className="text-[10px] font-bold uppercase border border-border-bright bg-background text-text px-1 py-0.5 outline-none hover:border-primary transition-colors"
                             >
                                 <option value="RUNNING">RUNNING focus</option>
-                                <option value="HYROX">HYROX focus</option>
                                 <option value="WORKOUT">WORKOUT focus</option>
                                 <option value="MIXED">MIXED (ALL)</option>
                             </select>
