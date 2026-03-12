@@ -60,7 +60,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
         const dist = parseFloat(newRun.distance);
         const dur = parseFloat(newRun.duration);
 
-        const isHybridType = newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX';
+        const isHybridType = newRun.activityType === 'WORKOUT';
 
         // Validation: Need at least a description or distance/duration for hybrid types
         if (isHybridType && !newRun.workoutDescription.trim() && !dist) {
@@ -134,7 +134,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
 
             {/* Filter Menu */}
             <div className="flex border-y-2 border-border-bright bg-background sticky top-8 z-30 overflow-x-auto no-scrollbar">
-                {['RUNNING', 'HYROX', 'WORKOUT', 'MIXED'].map((filter) => (
+                {['RUNNING', 'WORKOUT', 'MIXED'].map((filter) => (
                     <button
                         key={filter}
                         onClick={() => setActiveFilter(filter)}
@@ -153,15 +153,15 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
             {showLogForm && (
                 <form onSubmit={handleLogRun} className="mx-4 bg-background border-2 border-border-bright p-4 space-y-4">
                     <h3 className="font-bold text-lg uppercase border-b border-border-bright pb-2">New Entry</h3>
-                    {(newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX') && (
+                    {newRun.activityType === 'WORKOUT' && (
                         <div className="border-2 border-primary p-3 bg-primary/5">
                             <label className="text-[10px] font-black uppercase text-primary mb-2 block tracking-widest">
-                                {newRun.activityType === 'HYROX' ? 'HYROX STATIONS / DETAILS' : 'Workout Details / Manifest'}
+                                Workout Details / Manifest
                             </label>
                             <textarea
                                 value={newRun.workoutDescription}
                                 onChange={e => setNewRun({ ...newRun, workoutDescription: e.target.value })}
-                                placeholder={newRun.activityType === 'HYROX' ? "E.G. 1000M ROW, 80M BURPEES, 100M LUNGES..." : "E.G. 5X5 BACK SQUATS, CORE CIRCUIT, KETTLEBELL FLOW..."}
+                                placeholder="E.G. 5X5 BACK SQUATS, CORE CIRCUIT, KETTLEBELL FLOW..."
                                 className="w-full bg-background border border-primary p-2 text-xs text-text focus:border-white outline-none font-mono uppercase min-h-[80px]"
                             />
                         </div>
@@ -170,7 +170,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="text-[10px] font-bold uppercase text-secondary mb-1 block">
-                                {(newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX') ? 'Run / Interval (KM)' : 'Distance (KM)'}
+                                {newRun.activityType === 'WORKOUT' ? 'Run / Interval (KM)' : 'Distance (KM)'}
                             </label>
                             <select
                                 value={newRun.distance}
@@ -185,7 +185,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                         </div>
                         <div>
                             <label className="text-[10px] font-bold uppercase text-secondary mb-1 block">
-                                {(newRun.activityType === 'WORKOUT' || newRun.activityType === 'HYROX') ? 'Total Time (MIN)' : 'Duration (MIN)'}
+                                {newRun.activityType === 'WORKOUT' ? 'Total Time (MIN)' : 'Duration (MIN)'}
                             </label>
                             <select
                                 value={newRun.duration}
@@ -228,7 +228,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                     <div>
                         <label className="text-xs uppercase text-secondary mb-1 block">Activity Type</label>
                         <div className="flex gap-2">
-                            {['RUN', 'HYROX', 'WORKOUT'].map(type => (
+                            {['RUN', 'WORKOUT'].map(type => (
                                 <button
                                     key={type}
                                     type="button"
@@ -284,7 +284,6 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                         .filter(run => {
                             if (activeFilter === 'MIXED') return true;
                             if (activeFilter === 'RUNNING') return run.activityType === 'RUN';
-                            if (activeFilter === 'HYROX') return run.activityType === 'HYROX';
                             if (activeFilter === 'WORKOUT') return run.activityType === 'WORKOUT';
                             return true;
                         })
@@ -305,10 +304,7 @@ export default function FeedFeature({ user, profile, onViewProfile }) {
                                     </div>
                                     <div className="flex flex-col items-end gap-1">
                                         {run.activityType && (
-                                            <span className={cn(
-                                                "text-[10px] font-bold px-2 py-0.5 uppercase",
-                                                run.activityType === 'HYROX' ? "bg-secondary text-background" : "bg-primary text-black"
-                                            )}>
+                                            <span className="text-[10px] font-bold px-2 py-0.5 uppercase bg-primary text-black">
                                                 {run.activityType}
                                             </span>
                                         )}
