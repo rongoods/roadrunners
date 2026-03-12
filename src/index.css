@@ -35,6 +35,16 @@
   /* Dark Gray for secondary text */
 }
 
+/* Blueprint Mode Overrides */
+.blueprint-mode {
+  --bg-color: #275da9;      /* classic blueprint blue */
+  --surface-color: #275da9;
+  --primary-color: #ffffff; /* bright white for contrast */
+  --text-color: #ffffff;
+  --border-color: #ffffff;
+  --secondary-color: rgba(255, 255, 255, 0.7); /* softer white */
+}
+
 @theme {
   --color-background: var(--bg-color);
   --color-surface: var(--surface-color);
@@ -123,6 +133,15 @@ select option {
 .light-mode .bg-grid-pattern {
   opacity: 0.1;
   /* Slightly stronger in light mode for visibility */
+}
+
+/* Make grid look more striking in blueprint mode */
+.blueprint-mode .bg-grid-pattern {
+  opacity: 0.15;
+  background-size: 20px 20px;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.6) 1px, transparent 1px);
 }
 
 .scanlines {
